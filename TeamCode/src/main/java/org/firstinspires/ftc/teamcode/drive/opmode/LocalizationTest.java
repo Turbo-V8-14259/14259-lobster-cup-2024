@@ -27,15 +27,23 @@ public class LocalizationTest extends LinearOpMode {
         waitForStart();
 
         while (!isStopRequested()) {
-            Vector2d input = new Vector2d(
-                    -gamepad1.left_stick_y,
-                    -gamepad1.left_stick_x
-            ).rotated(-drive.getPoseEstimate().getHeading());
-
+            //uncomment for feild centric controls
+//            Vector2d input = new Vector2d(
+//                    -gamepad1.left_stick_y,
+//                    -gamepad1.left_stick_x
+//            ).rotated(-drive.getPoseEstimate().getHeading());
+//
+//            drive.setWeightedDrivePower(
+//                    new Pose2d(
+//                        input.getX(),
+//                            input.getY(),
+//                            gamepad1.right_stick_x
+//                    )
+//            );
             drive.setWeightedDrivePower(
                     new Pose2d(
-                        input.getX(),
-                            input.getY(),
+                            gamepad1.left_stick_x,
+                            gamepad1.left_stick_y,
                             gamepad1.right_stick_x
                     )
             );
