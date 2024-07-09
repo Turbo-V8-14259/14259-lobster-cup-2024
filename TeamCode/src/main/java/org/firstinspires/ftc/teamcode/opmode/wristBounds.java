@@ -9,8 +9,8 @@ import org.firstinspires.ftc.teamcode.usefuls.Gamepad.stickyGamepad;
 @TeleOp
 public class wristBounds extends LinearOpMode {
     //after intake(into the robot): 0.25
-    //max angle of claw: 250
-    //claw neutral, resting on ground: 0
+    //max angle of claw: 205
+    //claw neutral, resting on ground: 1
     double target = 0.5;
     @Override
     public void runOpMode() throws InterruptedException {

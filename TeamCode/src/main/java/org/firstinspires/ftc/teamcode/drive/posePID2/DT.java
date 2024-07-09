@@ -72,10 +72,10 @@ public class DT{
         this.leftRear = hardwareMap.get(DcMotorEx.class, "bl");
         this.rightRear = hardwareMap.get(DcMotorEx.class, "br");
         this.rightFront = hardwareMap.get(DcMotorEx.class, "fr");
-        this.rightRear.setDirection(DcMotor.Direction.FORWARD);
-        this.rightFront.setDirection(DcMotor.Direction.FORWARD);
-        this.leftFront.setDirection(DcMotor.Direction.REVERSE);
-        this.leftRear.setDirection(DcMotor.Direction.REVERSE);
+        rightRear.setDirection(DcMotor.Direction.REVERSE);
+        rightFront.setDirection(DcMotor.Direction.FORWARD);
+        leftFront.setDirection(DcMotor.Direction.REVERSE);
+        leftRear.setDirection(DcMotor.Direction.FORWARD); //turning reversed
         this.xyCoeff = new PIDCoefficients(DTConstants.xyP, DTConstants.xyI, DTConstants.xyD);
         this.NxyCoeff = new PIDCoefficients(DTConstants.NxyP, DTConstants.NxyI, DTConstants.NxyD);
         this.rCoeff = new PIDCoefficients(DTConstants.rP, DTConstants.rI, DTConstants.rD);
@@ -103,10 +103,10 @@ public class DT{
         this.leftRear = hardwareMap.get(DcMotorEx.class, "bl");
         this.rightRear = hardwareMap.get(DcMotorEx.class, "br");
         this.rightFront = hardwareMap.get(DcMotorEx.class, "fr");
-        this.rightRear.setDirection(DcMotor.Direction.FORWARD);
-        this.rightFront.setDirection(DcMotor.Direction.FORWARD);
-        this.leftFront.setDirection(DcMotor.Direction.REVERSE);
-        this.leftRear.setDirection(DcMotor.Direction.REVERSE);
+        rightRear.setDirection(DcMotor.Direction.REVERSE);
+        rightFront.setDirection(DcMotor.Direction.FORWARD);
+        leftFront.setDirection(DcMotor.Direction.REVERSE);
+        leftRear.setDirection(DcMotor.Direction.FORWARD); //turning reversed
         this.xyCoeff = new PIDCoefficients(DTConstants.xyP, DTConstants.xyI, DTConstants.xyD);
         this.rCoeff = new PIDCoefficients(DTConstants.rP, DTConstants.rI, DTConstants.rD);
         this.pprCoeff = new PIDCoefficients(DTConstants.pPrP, DTConstants.pPrI, DTConstants.pPrD);
@@ -133,10 +133,10 @@ public class DT{
         this.rightRear = hardwareMap.get(DcMotorEx.class, "br");
         this.rightFront = hardwareMap.get(DcMotorEx.class, "fr");
 
-        this.rightRear.setDirection(DcMotor.Direction.FORWARD);
-        this.rightFront.setDirection(DcMotor.Direction.FORWARD);
-        this.leftFront.setDirection(DcMotor.Direction.REVERSE);
-        this.leftRear.setDirection(DcMotor.Direction.REVERSE);
+        rightRear.setDirection(DcMotor.Direction.REVERSE);
+        rightFront.setDirection(DcMotor.Direction.FORWARD);
+        leftFront.setDirection(DcMotor.Direction.REVERSE);
+        leftRear.setDirection(DcMotor.Direction.FORWARD); //turning reversed
         this.xyCoeff = new PIDCoefficients(DTConstants.xyP, DTConstants.xyI, DTConstants.xyD);
         this.rCoeff = new PIDCoefficients(DTConstants.rP, DTConstants.rI, DTConstants.rD);
         this.pprCoeff = new PIDCoefficients(DTConstants.pPrP, DTConstants.pPrI, DTConstants.pPrD);
@@ -158,10 +158,10 @@ public class DT{
         this.rightRear = hardwareMap.get(DcMotorEx.class, "br");
         this.rightFront = hardwareMap.get(DcMotorEx.class, "fr");
 
-        this.rightRear.setDirection(DcMotor.Direction.FORWARD);
-        this.rightFront.setDirection(DcMotor.Direction.FORWARD);
-        this.leftFront.setDirection(DcMotor.Direction.REVERSE);
-        this.leftRear.setDirection(DcMotor.Direction.REVERSE);
+        rightRear.setDirection(DcMotor.Direction.REVERSE);
+        rightFront.setDirection(DcMotor.Direction.FORWARD);
+        leftFront.setDirection(DcMotor.Direction.REVERSE);
+        leftRear.setDirection(DcMotor.Direction.FORWARD); //turning reversed
         this.xyCoeff = new PIDCoefficients(DTConstants.xyP, DTConstants.xyI, DTConstants.xyD);
         this.rCoeff = new PIDCoefficients(DTConstants.rP, DTConstants.rI, DTConstants.rD);
         this.pprCoeff = new PIDCoefficients(DTConstants.pPrP, DTConstants.pPrI, DTConstants.pPrD);
@@ -179,9 +179,9 @@ public class DT{
     public void setPowers(double y, double x, double r){
         if(!forceStop){
             normalize = Math.max(Math.abs(x) + Math.abs(y) + Math.abs(r), 1);
-            flPower = (y+x+r);
+            flPower = (y+x-r);
             blPower = (y-x+r);
-            brPower = (y+x-r);
+            brPower = (y+x+r);
             frPower = (y-x-r);
             leftFront.setPower((flPower/normalize));
             leftRear.setPower((blPower/normalize));

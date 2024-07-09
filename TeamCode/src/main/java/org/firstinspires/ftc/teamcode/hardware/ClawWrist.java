@@ -12,7 +12,8 @@ public class ClawWrist {
         OPEN,
         CLOSEDLeft,
         CLOSEDRight,
-        CLOSED
+        CLOSED,
+        PIXEL_REARRANGE
     }
     public enum WristState {
         INTAKE,
@@ -36,8 +37,8 @@ public class ClawWrist {
         clawRight.setLowerBound(0.87);
         clawRight.setUpperBound(0.49);
         wrist = new ServoMotorBetter(hardwareMap.get(Servo.class, "w"));
-        wrist.setLowerBound(0);
-        wrist.setUpperBound(1);
+        wrist.setLowerBound(1);
+        wrist.setUpperBound(.25);
         //bounds
     }
     public ClawWrist.ClawState getStateClaw(){
@@ -46,21 +47,63 @@ public class ClawWrist {
     public ClawWrist.WristState getStateWrist(){
         return wristFSM;
     }
-    private double targetC = 0;
+    private double targetL = 0;
+    private double targetR = 0;
+
     public void setClawState(ClawState state){
         this.clawFSM = state;
         switch (clawFSM){
             case OPENLeft:
-                targetC = 0;
+                targetL = 0;
                 break;
             case OPENRight:
-                targetC = 1;
+                targetR = 0;
                 break;
             case CLOSEDLeft:
-                targetC = 1;
+                targetL = 1;
+                break;
+            case CLOSEDRight:
+                targetR = 1;
+                break;
+            case OPEN:
+                targetL = 0;
+                targetR = 0;
+                break;
+            case CLOSED:
+                targetL = 1;
+                targetR = 1;
                 break;
         }
     }
+
+    private double targetW = 0;
+    public void setWristState(WristState state){
+        this.wristFSM = state;
+        switch (wristFSM){
+            case INTAKE:
+                targetW = 0;
+                break;
+            case NEUTRAL:
+                targetW = 1;
+                break;
+            case OUTTAKE:
+                //math
+                break;
+            case PIXEL_REARRANGE:
+                //score position offsetted by sm
+                break;
+        }
+    }
+    public void update(){
+        clawLeft.setPosition(targetL);
+        clawRight.setPosition(targetR);
+        wrist.setPosition(targetW);
+        clawLeft.update();
+        clawRight.update();
+        wrist.update();
+    }
+
+
 
 
 
