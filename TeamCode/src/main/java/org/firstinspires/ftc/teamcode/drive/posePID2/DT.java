@@ -68,10 +68,10 @@ public class DT{
         this.vs = hardwareMap.voltageSensor.iterator().next();
         this.drive = new SampleMecanumDrive(hardwareMap);
         this.drive.setPoseEstimate(new Pose2d(0, 0, 0));
-        this.leftFront = hardwareMap.get(DcMotorEx.class, "LeftFront");
-        this.leftRear = hardwareMap.get(DcMotorEx.class, "LeftBack");
-        this.rightRear = hardwareMap.get(DcMotorEx.class, "RightBack");
-        this.rightFront = hardwareMap.get(DcMotorEx.class, "RightFront");
+        this.leftFront = hardwareMap.get(DcMotorEx.class, "fl");
+        this.leftRear = hardwareMap.get(DcMotorEx.class, "bl");
+        this.rightRear = hardwareMap.get(DcMotorEx.class, "br");
+        this.rightFront = hardwareMap.get(DcMotorEx.class, "fr");
         this.rightRear.setDirection(DcMotor.Direction.FORWARD);
         this.rightFront.setDirection(DcMotor.Direction.FORWARD);
         this.leftFront.setDirection(DcMotor.Direction.REVERSE);
@@ -99,10 +99,10 @@ public class DT{
         this.vs = hardwareMap.voltageSensor.iterator().next();
         this.drive = new SampleMecanumDrive(hardwareMap);
         this.drive.setPoseEstimate(new Pose2d(0, 0, 0));
-        this.leftFront = hardwareMap.get(DcMotorEx.class, "LeftFront");
-        this.leftRear = hardwareMap.get(DcMotorEx.class, "LeftBack");
-        this.rightRear = hardwareMap.get(DcMotorEx.class, "RightBack");
-        this.rightFront = hardwareMap.get(DcMotorEx.class, "RightFront");
+        this.leftFront = hardwareMap.get(DcMotorEx.class, "fl");
+        this.leftRear = hardwareMap.get(DcMotorEx.class, "bl");
+        this.rightRear = hardwareMap.get(DcMotorEx.class, "br");
+        this.rightFront = hardwareMap.get(DcMotorEx.class, "fr");
         this.rightRear.setDirection(DcMotor.Direction.FORWARD);
         this.rightFront.setDirection(DcMotor.Direction.FORWARD);
         this.leftFront.setDirection(DcMotor.Direction.REVERSE);
@@ -128,10 +128,10 @@ public class DT{
         this.vs = hardwareMap.voltageSensor.iterator().next();
         this.drive = new SampleMecanumDrive(hardwareMap);
         this.drive.setPoseEstimate(startPose);
-        this.leftFront = hardwareMap.get(DcMotorEx.class, "LeftFront");
-        this.leftRear = hardwareMap.get(DcMotorEx.class, "LeftBack");
-        this.rightRear = hardwareMap.get(DcMotorEx.class, "RightBack");
-        this.rightFront = hardwareMap.get(DcMotorEx.class, "RightFront");
+        this.leftFront = hardwareMap.get(DcMotorEx.class, "fl");
+        this.leftRear = hardwareMap.get(DcMotorEx.class, "bl");
+        this.rightRear = hardwareMap.get(DcMotorEx.class, "br");
+        this.rightFront = hardwareMap.get(DcMotorEx.class, "fr");
 
         this.rightRear.setDirection(DcMotor.Direction.FORWARD);
         this.rightFront.setDirection(DcMotor.Direction.FORWARD);
@@ -153,10 +153,10 @@ public class DT{
         this.vs = hardwareMap.voltageSensor.iterator().next();
         this.drive = new SampleMecanumDrive(hardwareMap);
         this.drive.setPoseEstimate(startPose);
-        this.leftFront = hardwareMap.get(DcMotorEx.class, "LeftFront");
-        this.leftRear = hardwareMap.get(DcMotorEx.class, "LeftBack");
-        this.rightRear = hardwareMap.get(DcMotorEx.class, "RightBack");
-        this.rightFront = hardwareMap.get(DcMotorEx.class, "RightFront");
+        this.leftFront = hardwareMap.get(DcMotorEx.class, "fl");
+        this.leftRear = hardwareMap.get(DcMotorEx.class, "bl");
+        this.rightRear = hardwareMap.get(DcMotorEx.class, "br");
+        this.rightFront = hardwareMap.get(DcMotorEx.class, "fr");
 
         this.rightRear.setDirection(DcMotor.Direction.FORWARD);
         this.rightFront.setDirection(DcMotor.Direction.FORWARD);
