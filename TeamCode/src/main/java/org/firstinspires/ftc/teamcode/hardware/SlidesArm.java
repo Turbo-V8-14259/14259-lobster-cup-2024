@@ -22,25 +22,32 @@ public class SlidesArm {
 
     private DcMotorBetter s;
     private DcMotorBetter a;
-    private DcMotorEx bl;
+    private DcMotorBetter bl;
 
 
     private PID linSlideController;
     public static double targetLinSlidePosition = 0;
-    public static double Kp = 0.01, Ki = 0, Kd = 0;
+    public static double Kp = 7, Ki = 3, Kd = .5;
 
     public SlidesArm(HardwareMap hardwareMap){
         s = new DcMotorBetter(hardwareMap.get(DcMotorEx.class, "s"));
         a = new DcMotorBetter(hardwareMap.get(DcMotorEx.class, "a"));
-        bl = hardwareMap.get(DcMotorEx.class, "bl");
-//        this.linSlideController = new PID(new PID.Coefficients(Kp, Ki, Kd),
-//                () -> (this.bl.getCurrentPosition()) - this.targetLinSlidePosition,
-//                factor -> {
-//                    this.s.setPower(M.clamp(factor, 1, -1));
-//                });
+        bl = new DcMotorBetter(hardwareMap.get(DcMotorEx.class, "bl"));
+        bl.setLowerBound(S_LOWER_BOUND);
+        bl.setUpperBound(S_UPPER_BOUND);
+        this.linSlideController = new PID(new PID.Coefficients(Kp, Ki, Kd),
+                () -> (this.bl.getCurrentPosition()) - this.targetLinSlidePosition,
+                factor -> {
+                    this.s.setPower(M.clamp(factor, .8, -1)); //b is extension
+                });
+    }
+    public SlidesArm stopAndResetEncoder() {
+        this.s.stopAndResetEncoder();
+        this.a.stopAndResetEncoder();
+        return this;
     }
 
-    public double getCurrentPosition() {
+    public double getCurrentSlidesPosition() {
         return this.bl.getCurrentPosition();
     }
 
@@ -48,12 +55,12 @@ public class SlidesArm {
         targetLinSlidePosition = (inches * INCHES_TO_TICKS)  / S_UPPER_BOUND; //untested
     }
     public double getCurrentInches() {
-        return  getCurrentPosition()/INCHES_TO_TICKS;
+        return  (getCurrentSlidesPosition()/INCHES_TO_TICKS) * S_UPPER_BOUND;
     }
 
     public void update(){
-//        linSlideController.update();
-//        s.update();
+        linSlideController.update();
+        s.update();
     }
 
 }

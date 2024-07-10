@@ -41,6 +41,21 @@ public class ClawWrist {
         wrist.setUpperBound(.25);
         //bounds
     }
+    private double targetW = 0;
+
+    public void setAngle(double angle){
+        //0 is 0, 1, is 195 degrees
+        if(angle<0){
+            targetW = 0;
+        }else if(angle>195){
+            targetW = 1;
+        }else {
+            targetW = (angle/195);
+        }
+    }
+    public void alignBoard(double armAngle){
+        setAngle(290-armAngle);
+    }
     public ClawWrist.ClawState getStateClaw(){
         return clawFSM;
     }
@@ -49,6 +64,9 @@ public class ClawWrist {
     }
     private double targetL = 0;
     private double targetR = 0;
+    public double getTargetW(){
+        return targetW;
+    }
 
     public void setClawState(ClawState state){
         this.clawFSM = state;
@@ -76,7 +94,6 @@ public class ClawWrist {
         }
     }
 
-    private double targetW = 0;
     public void setWristState(WristState state){
         this.wristFSM = state;
         switch (wristFSM){

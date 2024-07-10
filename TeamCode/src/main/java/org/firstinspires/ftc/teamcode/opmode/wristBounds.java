@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.hardware.ClawWrist;
 import org.firstinspires.ftc.teamcode.usefuls.Gamepad.stickyGamepad;
 
 @TeleOp
@@ -14,22 +15,15 @@ public class wristBounds extends LinearOpMode {
     double target = 0.5;
     @Override
     public void runOpMode() throws InterruptedException {
-        Servo servo = hardwareMap.get(Servo.class, "w");
         stickyGamepad gamepad = new stickyGamepad(gamepad1);
-        servo.setPosition(0.5);
-
+        ClawWrist wrist = new ClawWrist(hardwareMap);
         waitForStart();
         while(opModeIsActive()){
-            servo.setPosition(target);
-
-            if(gamepad.left_bumper){
-                target+=0.05;
-            }else if(gamepad.right_bumper){
-                target-=0.05;
-            }
-            telemetry.addData("one", target);
+            wrist.setWristState(ClawWrist.WristState.OUTTAKE);
+            wrist.setAngle(90);
+            wrist.update();
+            telemetry.addData("target w", wrist.getTargetW());
             telemetry.update();
-            gamepad.update();
         }
     }
 }
