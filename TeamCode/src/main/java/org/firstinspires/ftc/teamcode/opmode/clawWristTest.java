@@ -64,6 +64,8 @@ public class clawWristTest extends LinearOpMode {
 //                intakeState = 1; }
             if(intakeState == 1){
                 clawWrist.setClawState(ClawWrist.ClawState.CLOSED);
+                slidesArm.setInches(10);
+
                 if(timeToggle){//timeToggle starts at true by default
                     TimeStamp = timer.milliseconds();
                     timeToggle = false;
@@ -73,20 +75,20 @@ public class clawWristTest extends LinearOpMode {
                     timeToggle = true;
                 }
             } else if(intakeState == 2){
-                slidesArm.setInches(target);
+                slidesArm.setInches(1);
                 //arm logic if fixed?
                 clawWrist.setWristState(ClawWrist.WristState.OUTTAKE);
                 double angle = br.getCurrentPosition() * .225;
                 clawWrist.alignBoard(angle);
                 clawWrist.update();
-                if(timeToggle){//time toggle here to give time for it to align
-                    TimeStamp = timer.milliseconds();
-                    timeToggle = false;
-                }
-                if(timer.milliseconds() > TimeStamp + 500){
-                    intakeState=3;
-                    timeToggle = true;
-                }
+//                if(timeToggle){//time toggle here to give time for it to align
+//                    TimeStamp = timer.milliseconds();
+//                    timeToggle = false;
+//                }
+//                if(timer.milliseconds() > TimeStamp + 500){
+//                    intakeState=3;
+//                    timeToggle = true;
+//                }
             } else if(intakeState == 3){
                 clawWrist.setClawState(ClawWrist.ClawState.OPEN);
             } else if(intakeState == 0){
