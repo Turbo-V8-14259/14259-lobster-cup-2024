@@ -25,7 +25,7 @@ public class SlidesArm {
     private static final double A_UPPER_BOUND = 800; //180 degrees
     public static final double TICKS_DEGREE_CONSTANT = 4.44444444444; //.225
 
-
+    public static double kp=5;
     private DcMotorBetter s;
     private DcMotorBetter a;
     private DcMotorBetter bl;
@@ -60,11 +60,7 @@ public class SlidesArm {
                 factor -> {
                     this.s.setPower(M.clamp(factor, .8, -1)); //b is extension
                 });
-        this.armController = new PID(new PID.Coefficients(aKp, aKi, aKd),
-                () -> (this.br.getCurrentPosition()) - this.targetArmPosition,
-                factor -> {
-                    this.a.setPower(M.clamp(factor, 1, -1)); //b is extension
-                });
+
     }
     public SlidesArm stopAndResetEncoder() {
         this.s.stopAndResetEncoder();
@@ -97,7 +93,12 @@ public class SlidesArm {
 
     public void update(){
         linSlideController.update();
-        armController.update();
+
+        double error = targetArmPosition - getCurrentArmPosition();
+        double armPower = kp*error;
+
+        a.setPower(armPower);
+
         a.update();
         s.update();
     }

@@ -97,9 +97,12 @@ public class clawWristTest extends LinearOpMode {
 
                 clawWrist.setClawState(ClawWrist.ClawState.OPEN);
             }
+
             if(gamepad.left_bumper) {//intake pixels
                 intakeState =0;
-            }else if(gamepad.right_bumper) {//release pizels
+            }
+
+            if(gamepad.right_bumper) {//release pizels
                 intakeState =1;
             }
 
