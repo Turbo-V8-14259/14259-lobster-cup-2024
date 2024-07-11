@@ -45,7 +45,7 @@ public class AprilTagTest extends LinearOpMode {
     double cx = 451.512327554f;
     double cy = 232.379726059f;
     // UNITS ARE METERS
-    double tagsize = 0.0508;
+    double tagsize = 0.2286;
     int numFramesWithoutDetection = 0;
 
     @Override
@@ -112,15 +112,21 @@ public class AprilTagTest extends LinearOpMode {
 
                         Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
 
-                        double t1=(Math.PI)-Math.atan(detection.pose.x/detection.pose.z);
+                        double t1=(Math.PI/2)-Math.atan2(detection.pose.x,detection.pose.z);
 
                         double t2=Math.toRadians(rot.firstAngle);
 
-                        double t3=Math.PI-(t1+t2);
+                        double t3=(t1+t2);
 
-                        a1=(Math.PI/2)+Math.atan(detection.pose.x/detection.pose.z)-rot.firstAngle;
+                        double c = Math.sqrt(Math.pow(detection.pose.x*FEET_PER_METER,2)+Math.pow(detection.pose.z*FEET_PER_METER,2));
+
+                        double tx = Math.cos(t3)*c;
+
+                        double tz = Math.sin(t3)*c;
+
+
                         
-                        pythag1=Math.sqrt(Math.pow(detection.pose.x, 2)+Math.pow(detection.pose.z, 2));
+
                         
                         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
                         telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x * FEET_PER_METER));
@@ -131,18 +137,17 @@ public class AprilTagTest extends LinearOpMode {
                         telemetry.addLine(String.format("Rotation Roll: %.2f degrees", rot.thirdAngle));
                         telemetry.addLine(String.format("Bearing: %.2f degrees",Math.atan(detection.pose.x/detection.pose.z)*(180/Math.PI)));
                         telemetry.addLine(String.format("Elevation: %.2f degrees",Math.atan(detection.pose.y/detection.pose.z)*(180/Math.PI)));
-                        telemetry.addLine(Math.toDegrees(t1)+"");
-                        telemetry.addLine(Math.toDegrees(t2)+"");
-                        telemetry.addLine(Math.toDegrees(t3)+"");
+                        telemetry.addLine("True x:"+tx);
+                        telemetry.addLine("True z:"+tz);
 
-                        try { //may error out because tag is not in current game tag library
+                        /*try { //may error out because tag is not in current game tag library
                             //print out tag metadata
                             telemetry.addLine(tagPos.get(0) + " " + tagPos.get(1) + " " + tagPos.get(2) + " ");
                             telemetry.addLine(tagOrientation.toString());
                             telemetry.addLine(tagPos.get(0) + "");
                         } catch (Exception ignored) {
 
-                        }
+                        }*/
 
 
                     }
