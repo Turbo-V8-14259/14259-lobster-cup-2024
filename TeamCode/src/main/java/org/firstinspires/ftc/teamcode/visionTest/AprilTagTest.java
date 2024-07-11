@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.visionTest.pipeline.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
+import org.opencv.core.Mat;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -26,6 +27,10 @@ public class AprilTagTest extends LinearOpMode {
     final float DECIMATION_LOW = 2;
     final float THRESHOLD_HIGH_DECIMATION_RANGE_METERS = 1.0f;
     final int THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION = 4;
+    
+    double a1;
+    
+    double pythag1;
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
     VectorF tagPos;
@@ -107,6 +112,16 @@ public class AprilTagTest extends LinearOpMode {
 
                         Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
 
+                        double t1=(Math.PI)-Math.atan(detection.pose.x/detection.pose.z);
+
+                        double t2=Math.toRadians(rot.firstAngle);
+
+                        double t3=Math.PI-(t1+t2);
+
+                        a1=(Math.PI/2)+Math.atan(detection.pose.x/detection.pose.z)-rot.firstAngle;
+                        
+                        pythag1=Math.sqrt(Math.pow(detection.pose.x, 2)+Math.pow(detection.pose.z, 2));
+                        
                         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
                         telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x * FEET_PER_METER));
                         telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y * FEET_PER_METER));
@@ -114,8 +129,12 @@ public class AprilTagTest extends LinearOpMode {
                         telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", rot.firstAngle));
                         telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", rot.secondAngle));
                         telemetry.addLine(String.format("Rotation Roll: %.2f degrees", rot.thirdAngle));
-                        telemetry.addLine(String.format("Bearing: %.2f degrees",java.lang.Math.atan(detection.pose.x/detection.pose.z)*(180/3.14159)));
-                        telemetry.addLine(String.format("Elevation: %.2f degrees",java.lang.Math.atan(detection.pose.y/detection.pose.z)*(180/3.14159)));
+                        telemetry.addLine(String.format("Bearing: %.2f degrees",Math.atan(detection.pose.x/detection.pose.z)*(180/Math.PI)));
+                        telemetry.addLine(String.format("Elevation: %.2f degrees",Math.atan(detection.pose.y/detection.pose.z)*(180/Math.PI)));
+                        telemetry.addLine(Math.toDegrees(t1)+"");
+                        telemetry.addLine(Math.toDegrees(t2)+"");
+                        telemetry.addLine(Math.toDegrees(t3)+"");
+
                         try { //may error out because tag is not in current game tag library
                             //print out tag metadata
                             telemetry.addLine(tagPos.get(0) + " " + tagPos.get(1) + " " + tagPos.get(2) + " ");
