@@ -109,7 +109,7 @@ public class SlidesArm {
         }else{
             lowering=false;
         }
-        error = getCurrentArmPosition()-targetArmPosition ;
+        error = -1 * getCurrentArmPosition()-targetArmPosition ;
 
         double armPower = kp*error;
         if(getCurrentDegrees() < 85 && armPower > .2&&lowering){

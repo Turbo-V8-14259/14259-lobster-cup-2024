@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.usefuls.Motor;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -96,6 +97,7 @@ public class DcMotorBetter implements Motor {
     public DcMotorBetter stopAndResetEncoder() {
         this.stop();
         this.dcMotorEx.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        this.dcMotorEx.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         return this;
     }
 

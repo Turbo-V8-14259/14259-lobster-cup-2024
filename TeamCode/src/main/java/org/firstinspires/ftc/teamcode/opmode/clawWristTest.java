@@ -31,22 +31,22 @@ public class clawWristTest extends LinearOpMode {
     DT drive;
     @Override
     public void runOpMode() throws InterruptedException {
-//        drive = new DT(hardwareMap);
+        drive = new DT(hardwareMap);
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         ClawWrist clawWrist = new ClawWrist(hardwareMap);
         SlidesArm slidesArm = new SlidesArm(hardwareMap);
         slidesArm.stopAndResetEncoder();
         stickyGamepad gamepad = new stickyGamepad(gamepad1);
-        armMotor = hardwareMap.get(DcMotorEx.class, "a");
-        armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        armMotor = hardwareMap.get(DcMotorEx.class, "a");
+//        armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+//        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 //        br = hardwareMap.get(DcMotorEx.class, "br");
 //        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         waitForStart();
         while (opModeIsActive()){
-//            drive.setPowers(gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x);
+            drive.setPowers(gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x);
             if(bigState.equals("INTERMEDIATE")){
                 slidesArm.setDegrees(30);
                 clawWrist.setWristState(ClawWrist.WristState.NEUTRAL);
