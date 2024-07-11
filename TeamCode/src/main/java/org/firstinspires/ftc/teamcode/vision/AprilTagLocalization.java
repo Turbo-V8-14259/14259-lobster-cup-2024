@@ -21,7 +21,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import java.util.ArrayList;
 
 @TeleOp
-public class AprilTagTest extends LinearOpMode {
+public class AprilTagLocalization extends LinearOpMode {
     static final double FEET_PER_METER = 3.28084;
     final float DECIMATION_HIGH = 3;
     final float DECIMATION_LOW = 2;
