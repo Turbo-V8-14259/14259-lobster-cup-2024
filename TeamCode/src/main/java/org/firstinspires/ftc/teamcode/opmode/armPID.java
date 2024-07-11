@@ -23,6 +23,7 @@ public class armPID extends LinearOpMode {
             slidesArm.setDegrees(degreeTarget);
             slidesArm.update();
             telemetry.addData("angle", slidesArm.getCurrentDegrees());
+            telemetry.addData("error", slidesArm.getError());
             telemetry.update();
         }
     }

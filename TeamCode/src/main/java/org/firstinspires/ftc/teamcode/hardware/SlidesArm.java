@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -26,6 +27,7 @@ public class SlidesArm {
     public static final double TICKS_DEGREE_CONSTANT = 4.44444444444; //.225
 
     public static double kp=5;
+    private double error;
     private DcMotorBetter s;
     private DcMotorBetter a;
     private DcMotorBetter bl;
@@ -40,12 +42,15 @@ public class SlidesArm {
 
     public static double sKp = 7, sKi = 3, sKd = .5;
     public static double aKp = 5, aKi = 0, aKd = 0;
+    private boolean lowering = false;
+    private double targetAngle=0;
 
 
     public SlidesArm(HardwareMap hardwareMap){
         s = new DcMotorBetter(hardwareMap.get(DcMotorEx.class, "s"));
         a = new DcMotorBetter(hardwareMap.get(DcMotorEx.class, "a"));
         a.setDirection(DcMotorSimple.Direction.REVERSE);
+        a.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         bl = new DcMotorBetter(hardwareMap.get(DcMotorEx.class, "bl"));
         bl.setLowerBound(S_LOWER_BOUND);
@@ -63,11 +68,13 @@ public class SlidesArm {
 
     }
     public SlidesArm stopAndResetEncoder() {
-        this.s.stopAndResetEncoder();
-        this.a.stopAndResetEncoder();
+        this.br.stopAndResetEncoder();
+        this.bl.stopAndResetEncoder();
         return this;
     }
-
+    public double getError(){
+        return error;
+    }
     public double getCurrentSlidesPosition() {
         return this.bl.getCurrentPosition();
     }
@@ -76,6 +83,7 @@ public class SlidesArm {
     }
 
     public void setDegrees(double degrees){
+        targetAngle=degrees;
         targetArmPosition = (degrees * TICKS_DEGREE_CONSTANT) / A_UPPER_BOUND;
     }
     public double getCurrentDegrees(){
@@ -90,12 +98,24 @@ public class SlidesArm {
     public double getCurrentInches() {
         return  (getCurrentSlidesPosition()/INCHES_TO_TICKS) * S_UPPER_BOUND;
     }
-
+    public double getTargetAngle(){
+        return targetAngle;
+    }
     public void update(){
         linSlideController.update();
+        if(getTargetAngle()==0)
+        {
+            lowering=true;
+        }else{
+            lowering=false;
+        }
+        error = getCurrentArmPosition()-targetArmPosition ;
 
-        double error = targetArmPosition - getCurrentArmPosition();
         double armPower = kp*error;
+        if(getCurrentDegrees() < 85 && armPower > .2&&lowering){
+            armPower = 0;
+        }
+
 
         a.setPower(armPower);
 

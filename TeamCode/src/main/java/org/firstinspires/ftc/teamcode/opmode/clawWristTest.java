@@ -10,11 +10,12 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.drive.posePID2.DT;
 import org.firstinspires.ftc.teamcode.hardware.ClawWrist;
 import org.firstinspires.ftc.teamcode.hardware.SlidesArm;
 import org.firstinspires.ftc.teamcode.usefuls.Gamepad.stickyGamepad;
 
-@TeleOp
+@TeleOp(name = "probably tele")
 @Config
 public class clawWristTest extends LinearOpMode {
     int intakeState = 0;
@@ -24,8 +25,14 @@ public class clawWristTest extends LinearOpMode {
     public static double target = 0;
     DcMotorEx armMotor;
     DcMotorEx br;
+
+    String bigState = "INTERMEDIATE";
+    int intakeExtension = 10;
+    DT drive;
     @Override
     public void runOpMode() throws InterruptedException {
+//        drive = new DT(hardwareMap);
+
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         ClawWrist clawWrist = new ClawWrist(hardwareMap);
         SlidesArm slidesArm = new SlidesArm(hardwareMap);
@@ -35,76 +42,49 @@ public class clawWristTest extends LinearOpMode {
         armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        br = hardwareMap.get(DcMotorEx.class, "br");
-        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        br = hardwareMap.get(DcMotorEx.class, "br");
+//        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         waitForStart();
-        while(opModeIsActive()){
-//            if(intakeState == 1){
-//                clawWrist.setClawState(ClawWrist.ClawState.CLOSED);
-//                if(timeToggle){//timeToggle starts at true by default
-//                    TimeStamp = timer.milliseconds();
-//                    timeToggle = false;
-//                }
-//                if(timer.milliseconds() > TimeStamp + 500){
-//                    intakeState=2;
-//                    timeToggle = true;
-//                }
-//            } else if(intakeState == 2){
-//                slidesArm.setInches(target);
-//                clawWrist.setWristState(ClawWrist.WristState.NEUTRAL);
-//            } else if(intakeState == 0){
-//                slidesArm.setInches(target);
-//                clawWrist.setWristState(ClawWrist.WristState.INTAKE);
-//
-//                clawWrist.setClawState(ClawWrist.ClawState.OPEN);
-//            }
-//            if(gamepad.left_bumper){
-//                intakeState = 0;
-//            }else if(gamepad.right_bumper){
-//                intakeState = 1; }
-            if(intakeState == 1){
+        while (opModeIsActive()){
+//            drive.setPowers(gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x);
+            if(bigState.equals("INTERMEDIATE")){
+                slidesArm.setDegrees(30);
+                clawWrist.setWristState(ClawWrist.WristState.NEUTRAL);
                 clawWrist.setClawState(ClawWrist.ClawState.CLOSED);
-                slidesArm.setInches(10);
-
+                slidesArm.setInches(2);
+            }else if(bigState.equals("INTAKE1")){
+                slidesArm.setDegrees(15);
+                clawWrist.setWristState(ClawWrist.WristState.INTAKE);
                 if(timeToggle){//timeToggle starts at true by default
                     TimeStamp = timer.milliseconds();
                     timeToggle = false;
                 }
                 if(timer.milliseconds() > TimeStamp + 500){
-                    intakeState=2;
                     timeToggle = true;
+                    bigState = "INTAKEREADY";
                 }
-            } else if(intakeState == 2){
-                slidesArm.setInches(1);
-                //arm logic if fixed?
-                clawWrist.setWristState(ClawWrist.WristState.OUTTAKE);
-                double angle = br.getCurrentPosition() * .225;
-                clawWrist.alignBoard(angle);
-                clawWrist.update();
-//                if(timeToggle){//time toggle here to give time for it to align
-//                    TimeStamp = timer.milliseconds();
-//                    timeToggle = false;
-//                }
-//                if(timer.milliseconds() > TimeStamp + 500){
-//                    intakeState=3;
-//                    timeToggle = true;
-//                }
-            } else if(intakeState == 3){
+            }else if(bigState.equals("INTAKEREADY")){
                 clawWrist.setClawState(ClawWrist.ClawState.OPEN);
-            } else if(intakeState == 0){
-                slidesArm.setInches(target);
-                clawWrist.setWristState(ClawWrist.WristState.INTAKE);
-
-                clawWrist.setClawState(ClawWrist.ClawState.OPEN);
+                slidesArm.setDegrees(3);
+                slidesArm.setInches(intakeExtension);
+            }else if(bigState.equals("INTAKECLOSECLAW")) {
+                clawWrist.setClawState(ClawWrist.ClawState.CLOSED);
+                if(timeToggle){//timeToggle starts at true by default
+                    TimeStamp = timer.milliseconds();
+                    timeToggle = false;
+                }
+                if (timer.milliseconds() > TimeStamp + 500) {
+                    timeToggle = true;
+                    bigState = "INTERMEDIATE";
+                }
+            }
+            if(gamepad.left_bumper){
+                bigState = "INTAKE1";
+            }else if(gamepad.right_bumper){
+                bigState = "INTAKECLOSECLAW";
             }
 
-            if(gamepad.left_bumper) {//intake pixels
-                intakeState =0;
-            }
 
-            if(gamepad.right_bumper) {//release pizels
-                intakeState =1;
-            }
 
             telemetry.addData("current inches ",  slidesArm.getCurrentInches());
             telemetry.addData("target inches", target);
