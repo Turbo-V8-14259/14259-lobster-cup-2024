@@ -107,7 +107,7 @@ public class AprilTagTest extends LinearOpMode {
                     }
 
                     for (AprilTagDetection detection : detections) {
-                        tagPos = curLib.lookupTag(detection.id).fieldPosition;
+                         tagPos = curLib.lookupTag(detection.id).fieldPosition;
                         tagOrientation = curLib.lookupTag(detection.id).fieldOrientation.toOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
 
                         Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
