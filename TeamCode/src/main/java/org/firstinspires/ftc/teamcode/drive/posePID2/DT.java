@@ -26,7 +26,7 @@ public class DT{
     private double xTarget, yTarget, rTarget;
     private double xRn, yRn, rRn;
     private double deltaX, deltaY, deltaR;
-    private boolean isAtTarget;
+    private boolean isAtTarget =false;
 
 
     private double errorX, errorY; //PEE JAY

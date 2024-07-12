@@ -28,7 +28,10 @@ public class clawWristTest extends LinearOpMode {
 
     String bigState = "INTERMEDIATE";
     int intakeExtension = 10;
+    int depositExtension = 12;
+    int armAngle = 130;
     DT drive;
+    int depoFSM = 0;
     @Override
     public void runOpMode() throws InterruptedException {
         drive = new DT(hardwareMap);
@@ -51,7 +54,7 @@ public class clawWristTest extends LinearOpMode {
                 slidesArm.setDegrees(30);
                 clawWrist.setWristState(ClawWrist.WristState.NEUTRAL);
                 clawWrist.setClawState(ClawWrist.ClawState.CLOSED);
-                slidesArm.setInches(2);
+                slidesArm.setInches(1);
             }else if(bigState.equals("INTAKE1")){
                 slidesArm.setDegrees(15);
                 clawWrist.setWristState(ClawWrist.WristState.INTAKE);
@@ -77,17 +80,64 @@ public class clawWristTest extends LinearOpMode {
                     timeToggle = true;
                     bigState = "INTERMEDIATE";
                 }
+            }else if(bigState.equals("ARMFLIP")){
+                slidesArm.setDegrees(armAngle);
+                clawWrist.setWristState(ClawWrist.WristState.OUTTAKE);
+                clawWrist.alignBoard(-slidesArm.getCurrentDegrees());
+                if(timeToggle){//timeToggle starts at true by default
+                    TimeStamp = timer.milliseconds();
+                    timeToggle = false;
+                }
+                if (timer.milliseconds() > TimeStamp + 1000) {
+                    timeToggle = true;
+                    bigState = "SLIDESOUT";
+                }
+            }else if(bigState.equals("SLIDESOUT")){
+                slidesArm.setInches(depositExtension);
+                slidesArm.setDegrees(armAngle);
+                clawWrist.setWristState(ClawWrist.WristState.OUTTAKE);
+                clawWrist.alignBoard(-slidesArm.getCurrentDegrees());
+            }else if(bigState.equals("SCORE")){
+                clawWrist.setClawState(ClawWrist.ClawState.OPEN);
             }
+
+
+
+
             if(gamepad.left_bumper){
                 bigState = "INTAKE1";
             }else if(gamepad.right_bumper){
                 bigState = "INTAKECLOSECLAW";
             }
 
+            if(gamepad.a){
+                depoFSM++;
+                if(depoFSM==1){
+                    bigState = "ARMFLIP";
+                }else if(depoFSM == 2){
+                    bigState = "SCORE";
+                }else if(depoFSM == 3) {
+                    bigState = "INTERMEDIATE";
+                    depoFSM = 0;
+                }
+            }
 
 
-            telemetry.addData("current inches ",  slidesArm.getCurrentInches());
-            telemetry.addData("target inches", target);
+            if(gamepad.dpad_up){
+                depositExtension+=5;
+            }else if(gamepad.dpad_down){
+                depositExtension-=5;
+            }else if(gamepad.dpad_left)
+            {
+                armAngle+=10;
+            }else if(gamepad.dpad_right){
+                armAngle-=10;
+            }
+
+
+            telemetry.addData("big state, ", bigState);
+            telemetry.addData("depo fsm", depoFSM);
+            telemetry.addData("arm in degrees", slidesArm.getCurrentDegrees());
             telemetry.update();
             gamepad.update();
             clawWrist.update();
