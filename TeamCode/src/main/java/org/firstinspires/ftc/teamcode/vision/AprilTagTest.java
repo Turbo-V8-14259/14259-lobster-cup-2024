@@ -26,9 +26,9 @@ public class AprilTagTest extends LinearOpMode {
     final float DECIMATION_LOW = 2;
     final float THRESHOLD_HIGH_DECIMATION_RANGE_METERS = 1.0f;
     final int THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION = 4;
-    
+
     double a1;
-    
+
     double pythag1;
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
@@ -106,24 +106,24 @@ public class AprilTagTest extends LinearOpMode {
                     }
 
                     for (AprilTagDetection detection : detections) {
-                         tagPos = curLib.lookupTag(detection.id).fieldPosition;
+                        tagPos = curLib.lookupTag(detection.id).fieldPosition;
                         tagOrientation = curLib.lookupTag(detection.id).fieldOrientation.toOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
 
                         Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
 
-                        double t1=(Math.PI/2)-Math.atan2(detection.pose.x,detection.pose.z);
+                        double t1 = (Math.PI / 2) - Math.atan2(detection.pose.x, detection.pose.z);
 
-                        double t2=Math.toRadians(rot.firstAngle);
+                        double t2 = Math.toRadians(rot.firstAngle);
 
-                        double t3=(t1+t2);
+                        double t3 = (t1 + t2);
 
-                        double c = Math.sqrt(Math.pow(detection.pose.x*FEET_PER_METER,2)+Math.pow(detection.pose.z*FEET_PER_METER,2));
+                        double c = Math.sqrt(Math.pow(detection.pose.x * FEET_PER_METER, 2) + Math.pow(detection.pose.z * FEET_PER_METER, 2));
 
-                        double tx = Math.cos(t3)*c;
+                        double tx = Math.cos(t3) * c;
 
-                        double tz = Math.sin(t3)*c;
+                        double tz = Math.sin(t3) * c;
 
-                        
+
                         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
                         telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x * FEET_PER_METER));
                         telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y * FEET_PER_METER));
@@ -131,10 +131,10 @@ public class AprilTagTest extends LinearOpMode {
                         telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", rot.firstAngle));
                         telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", rot.secondAngle));
                         telemetry.addLine(String.format("Rotation Roll: %.2f degrees", rot.thirdAngle));
-                        telemetry.addLine(String.format("Bearing: %.2f degrees",Math.atan(detection.pose.x/detection.pose.z)*(180/Math.PI)));
-                        telemetry.addLine(String.format("Elevation: %.2f degrees",Math.atan(detection.pose.y/detection.pose.z)*(180/Math.PI)));
-                        telemetry.addLine("True x:"+tx);
-                        telemetry.addLine("True z:"+tz);
+                        telemetry.addLine(String.format("Bearing: %.2f degrees", Math.atan(detection.pose.x / detection.pose.z) * (180 / Math.PI)));
+                        telemetry.addLine(String.format("Elevation: %.2f degrees", Math.atan(detection.pose.y / detection.pose.z) * (180 / Math.PI)));
+                        telemetry.addLine("True x:" + tx);
+                        telemetry.addLine("True z:" + tz);
 
                         try { //may error out because tag is not in current game tag library
                             //print out tag metadata
