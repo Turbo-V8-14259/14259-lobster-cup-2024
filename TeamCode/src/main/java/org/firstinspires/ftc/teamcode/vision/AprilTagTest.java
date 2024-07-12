@@ -123,9 +123,6 @@ public class AprilTagTest extends LinearOpMode {
 
                         double tz = Math.sin(t3)*c;
 
-
-                        
-
                         
                         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
                         telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x * FEET_PER_METER));
@@ -139,14 +136,14 @@ public class AprilTagTest extends LinearOpMode {
                         telemetry.addLine("True x:"+tx);
                         telemetry.addLine("True z:"+tz);
 
-                        /*try { //may error out because tag is not in current game tag library
+                        try { //may error out because tag is not in current game tag library
                             //print out tag metadata
                             telemetry.addLine(tagPos.get(0) + " " + tagPos.get(1) + " " + tagPos.get(2) + " ");
                             telemetry.addLine(tagOrientation.toString());
                             telemetry.addLine(tagPos.get(0) + "");
                         } catch (Exception ignored) {
 
-                        }*/
+                        }
 
 
                     }
