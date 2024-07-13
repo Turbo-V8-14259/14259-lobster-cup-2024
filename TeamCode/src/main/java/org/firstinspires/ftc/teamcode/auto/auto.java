@@ -43,18 +43,18 @@ public class auto extends LinearOpMode {
     double TimeStamp = 0;
     ElapsedTime timer = new ElapsedTime();
     State currentState;
-    Pose2d startPose = new Pose2d(12,-60, Math.toRadians(90));
+    public static Pose2d startPose = new Pose2d(12,-60, Math.toRadians(90));
 
-    Pose2d propMiddle = new Pose2d(12, -50,Math.toRadians(90));
-    Pose2d propLeft = new Pose2d(12, -50,Math.toRadians(120));
-    Pose2d propRight = new Pose2d(12, -50,Math.toRadians(70));
-    Pose2d afterProp = new Pose2d(12, -55,Math.toRadians(180));
-    Pose2d boardLeft = new Pose2d(35, -27.5,Math.toRadians(180));
-    Pose2d boardMiddle = new Pose2d(35, -30,Math.toRadians(180));
-    Pose2d boardRight = new Pose2d(35, -35,Math.toRadians(180));
-    Pose2d depositIntermediate = new Pose2d(35, -44, Math.toRadians(180));
-    Pose2d park1 = new Pose2d(37,-55, Math.toRadians(180));
-    Pose2d park2first = new Pose2d(37,-5, Math.toRadians(180));
+    public static Pose2d propMiddle = new Pose2d(12, -50,Math.toRadians(90));
+    public static Pose2d propLeft = new Pose2d(12, -50,Math.toRadians(120));
+    public static Pose2d propRight = new Pose2d(12, -50,Math.toRadians(70));
+    public static Pose2d afterProp = new Pose2d(12, -55,Math.toRadians(180));
+    public static Pose2d boardLeft = new Pose2d(35, -27.5,Math.toRadians(180));
+    public static Pose2d boardMiddle = new Pose2d(35, -30,Math.toRadians(180));
+    public static Pose2d boardRight = new Pose2d(35, -35,Math.toRadians(180));
+    public static Pose2d depositIntermediate = new Pose2d(35, -44, Math.toRadians(180));
+    public static Pose2d park1 = new Pose2d(37,-55, Math.toRadians(180));
+    public static Pose2d park2first = new Pose2d(37,-5, Math.toRadians(180));
     int intakeExtension = 10;
     public static int armAngle = 140;
     public static int pixelExtendsion = 12;
@@ -90,6 +90,7 @@ public class auto extends LinearOpMode {
             slidesArm.setInches(0);
             slidesArm.update();
             clawWrist.update();
+            //camera opencv pipeline
         }
 
         while(opModeIsActive()){
@@ -173,7 +174,7 @@ public class auto extends LinearOpMode {
                     }
                     if(timer.milliseconds() > TimeStamp + 5000){
                         timeToggle = true;
-                        if(randomization==0){
+                        if(randomization==0||randomization==1){
                             currentState=State.DEPOSIT;
                         }else{
                             currentState = State.AFTERPROP;
@@ -344,11 +345,9 @@ public class auto extends LinearOpMode {
                     break;
             }
             telemetry.addData("state", currentState);
-            telemetry.addData("at target",drive.isAtTarget());
             telemetry.addData("x", drive.getX());
             telemetry.addData("y", drive.getY());
             telemetry.addData("r", drive.getR());
-            telemetry.addData("check", 4);
             telemetry.update();
             drive.update();
             slidesArm.update();
