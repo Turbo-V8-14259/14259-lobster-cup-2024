@@ -63,6 +63,8 @@ public class DT{
     double lastY = 0;
     double currentY = 0;
     double yVelocity = 0;
+    public static double rkp=1;
+    public static double rkd=0;
     public DT(HardwareMap hardwareMap, ElapsedTime timer){
         this.timer = timer;
         this.vs = hardwareMap.voltageSensor.iterator().next();
@@ -124,7 +126,8 @@ public class DT{
             drive.setPoseEstimate(new Pose2d(0, 0, 0));
         }
     }
-    public DT(HardwareMap hardwareMap, Pose2d startPose){
+    public DT(HardwareMap hardwareMap, Pose2d startPose, ElapsedTime timer){
+        this.timer = timer;
         this.vs = hardwareMap.voltageSensor.iterator().next();
         this.drive = new SampleMecanumDrive(hardwareMap);
         this.drive.setPoseEstimate(startPose);
@@ -302,7 +305,7 @@ public class DT{
 
                 lastTime = currentTime;
 
-                currentTime = timer.nanoseconds() / 1000000;
+                currentTime = timer.nanoseconds() * 1000000000;
 
 
                 deltaTime = currentTime - lastTime;
@@ -313,7 +316,7 @@ public class DT{
 
                 xOut = ((xTarget - currentX) * .075 - xVelocity * 0);
                 yOut = -((yTarget - currentY) * .075 - yVelocity * 0);
-                rOut = -((rTarget - twistedR) * 2.5 - turnVelocity * 140);
+                rOut = -((rTarget - twistedR) * rkp - turnVelocity * rkd);
 //        rOut = -rController.calculate(rTarget, twistedR);
                 xPower = (xOut * T.cos(rRn) - yOut * T.sin(rRn));
                 yPower = (xOut * T.sin(rRn) + yOut * T.cos(rRn));
@@ -370,6 +373,9 @@ public class DT{
     public void setXTarget(double x){
         this.xTarget = x;
     }
+    public double getCurrentTime(){
+        return currentTime;
+    }
     public void setYTarget(double y){
         this.yTarget = y;
     }
@@ -382,6 +388,7 @@ public class DT{
     public double getPowerY(){
         return yPower;
     }
+    public double getTurnVeloctiy(){return turnVelocity;}
     public double getPowerR(){
         return rOut;
     }

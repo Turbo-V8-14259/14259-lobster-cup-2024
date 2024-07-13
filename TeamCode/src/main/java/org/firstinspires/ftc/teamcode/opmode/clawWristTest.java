@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -32,15 +33,27 @@ public class clawWristTest extends LinearOpMode {
     int armAngle = 130;
     DT drive;
     int depoFSM = 0;
+    boolean clawLForce = false;
+    boolean forceLClawOpen = false;
+    boolean forceLClawClose = false;
+
+    boolean clawRForce = false;
+    boolean forceRClawOpen = false;
+    boolean forceRClawClose = false;
     @Override
     public void runOpMode() throws InterruptedException {
         drive = new DT(hardwareMap);
+        CRServo one = hardwareMap.get(CRServo.class, "hl"); //works port1
+        CRServo two = hardwareMap.get(CRServo.class, "hr");
+        one.setDirection(DcMotorSimple.Direction.REVERSE);
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         ClawWrist clawWrist = new ClawWrist(hardwareMap);
         SlidesArm slidesArm = new SlidesArm(hardwareMap);
-        slidesArm.stopAndResetEncoder();
+
         stickyGamepad gamepad = new stickyGamepad(gamepad1);
+        stickyGamepad gamepadTwo = new stickyGamepad(gamepad2);
+
 //        armMotor = hardwareMap.get(DcMotorEx.class, "a");
 //        armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 //        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -51,7 +64,7 @@ public class clawWristTest extends LinearOpMode {
         while (opModeIsActive()){
             drive.setPowers(gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x);
             if(bigState.equals("INTERMEDIATE")){
-                slidesArm.setDegrees(30);
+                slidesArm.setDegrees(25);
                 clawWrist.setWristState(ClawWrist.WristState.NEUTRAL);
                 clawWrist.setClawState(ClawWrist.ClawState.CLOSED);
                 slidesArm.setInches(1);
@@ -121,7 +134,11 @@ public class clawWristTest extends LinearOpMode {
                     depoFSM = 0;
                 }
             }
-
+//            if(gamepadTwo.left_bumper && !force){
+//                forceLClawOpen = true;
+//            }
+            one.setPower(gamepad1.left_trigger-gamepad1.right_trigger);
+            two.setPower(gamepad1.left_trigger-gamepad1.right_trigger);
 
             if(gamepad.dpad_up){
                 depositExtension+=5;
