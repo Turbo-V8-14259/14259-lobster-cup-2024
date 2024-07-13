@@ -55,7 +55,7 @@ public class redAuto extends LinearOpMode {
     public static Pose2d depositIntermediate = new Pose2d(35, -44, Math.toRadians(180));
     public static Pose2d park1 = new Pose2d(37,-55, Math.toRadians(180));
     public static Pose2d park2first = new Pose2d(37,-5, Math.toRadians(180));
-    int intakeExtension = 10; 
+    int intakeExtension = 10;
     public static int armAngle = 145;
     public static int pixelExtendsion = 13;
     public static int pixelMiddleExtension =16;
