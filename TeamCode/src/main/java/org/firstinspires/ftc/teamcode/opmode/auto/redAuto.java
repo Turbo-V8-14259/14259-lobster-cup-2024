@@ -49,17 +49,18 @@ public class redAuto extends LinearOpMode {
     public static Pose2d propLeft = new Pose2d(12, -50,Math.toRadians(120));
     public static Pose2d propRight = new Pose2d(12, -50,Math.toRadians(70));
     public static Pose2d afterProp = new Pose2d(12, -55,Math.toRadians(180));
-    public static Pose2d boardLeft = new Pose2d(35, -27.5,Math.toRadians(180));
-    public static Pose2d boardMiddle = new Pose2d(35, -30,Math.toRadians(180));
-    public static Pose2d boardRight = new Pose2d(35, -35,Math.toRadians(180));
+    public static Pose2d boardLeft = new Pose2d(33, -26.5,Math.toRadians(180));
+    public static Pose2d boardMiddle = new Pose2d(33, -29,Math.toRadians(180));
+    public static Pose2d boardRight = new Pose2d(33, -37,Math.toRadians(180));
     public static Pose2d depositIntermediate = new Pose2d(35, -44, Math.toRadians(180));
     public static Pose2d park1 = new Pose2d(37,-55, Math.toRadians(180));
     public static Pose2d park2first = new Pose2d(37,-5, Math.toRadians(180));
-    int intakeExtension = 10;
-    public static int armAngle = 140;
-    public static int pixelExtendsion = 12;
+    int intakeExtension = 10; 
+    public static int armAngle = 145;
+    public static int pixelExtendsion = 13;
+    public static int pixelMiddleExtension =16;
     public static int depositExtension =6;
-    private int randomization=0;//0:left, 1:middle, 2:right
+    public static int randomization=0;//0:left, 1:middle, 2:right
     //if(randomization==0){
     //
     //                    }else if(randomization==1){
@@ -138,7 +139,12 @@ public class redAuto extends LinearOpMode {
                     break;
                 case PIXEL1:
                     slidesArm.setDegrees(15);
-                    slidesArm.setInches(pixelExtendsion);
+                    if(randomization==1){
+                        slidesArm.setInches(pixelMiddleExtension);
+                    }else{
+                        slidesArm.setInches(pixelExtendsion);
+                    }
+
                     clawWrist.setWristState(ClawWrist.WristState.INTAKE);
 
 
@@ -174,12 +180,11 @@ public class redAuto extends LinearOpMode {
                     }
                     if(timer.milliseconds() > TimeStamp + 5000){
                         timeToggle = true;
-                        if(randomization==0||randomization==1){
-                            currentState=State.DEPOSIT;
-                        }else{
-                            currentState = State.AFTERPROP;
-                        }
+
+                        currentState=State.DEPOSIT;
                     }
+
+
                     break;
                 case AFTERPROP:
 
