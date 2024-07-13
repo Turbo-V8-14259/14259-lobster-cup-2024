@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -9,6 +10,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.teamcode.hardware.ClawWrist;
 
 @TeleOp
+@Disabled
+
 public class armBounds extends LinearOpMode {
     DcMotorEx armMotor;
     DcMotorEx br;

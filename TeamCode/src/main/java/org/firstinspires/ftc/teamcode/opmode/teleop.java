@@ -19,14 +19,9 @@ import org.firstinspires.ftc.teamcode.usefuls.Gamepad.stickyGamepad;
 @TeleOp(name = "! Teleop")
 @Config
 public class teleop extends LinearOpMode {
-    int intakeState = 0;
     boolean timeToggle = true;
     double TimeStamp = 0;
     ElapsedTime timer = new ElapsedTime();
-    public static double target = 0;
-    DcMotorEx armMotor;
-    DcMotorEx br;
-
     String bigState = "INTERMEDIATE";
     int intakeExtension = 10;
     int depositExtension = 12;
@@ -64,16 +59,18 @@ public class teleop extends LinearOpMode {
         while (opModeIsActive()){
             drive.setPowers(gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x);
             if(bigState.equals("INTERMEDIATE")){
-                slidesArm.setDegrees(20);
+                slidesArm.setDegrees(25);
                 clawWrist.setWristState(ClawWrist.WristState.NEUTRAL);
-                if(!clawOverride){
-                    clawWrist.setClawState(ClawWrist.ClawState.CLOSED);
-                }
+//                if(!clawOverride){
+//                    clawWrist.setClawState(ClawWrist.ClawState.CLOSED);
+//                }
+                clawWrist.setClawState(ClawWrist.ClawState.CLOSED);
+
                 slidesArm.setInches(1);
             }else if(bigState.equals("INTAKE1")){
-                clawOverride = false;
                 slidesArm.setDegrees(15);
                 clawWrist.setWristState(ClawWrist.WristState.INTAKE);
+
                 if(timeToggle){//timeToggle starts at true by default
                     TimeStamp = timer.milliseconds();
                     timeToggle = false;
@@ -83,10 +80,13 @@ public class teleop extends LinearOpMode {
                     bigState = "INTAKEREADY";
                 }
             }else if(bigState.equals("INTAKEREADY")){
-                clawWrist.setClawState(ClawWrist.ClawState.OPEN);
+                if(!clawOverride){
+                    clawWrist.setClawState(ClawWrist.ClawState.OPEN);
+                }
                 slidesArm.setDegrees(3);
                 slidesArm.setInches(intakeExtension);
             }else if(bigState.equals("INTAKECLOSECLAW")) {
+                clawOverride = false;
                 clawWrist.setClawState(ClawWrist.ClawState.CLOSED);
                 if(timeToggle){//timeToggle starts at true by default
                     TimeStamp = timer.milliseconds();
@@ -114,9 +114,8 @@ public class teleop extends LinearOpMode {
                 clawWrist.setWristState(ClawWrist.WristState.OUTTAKE);
                 clawWrist.alignBoard(-slidesArm.getCurrentDegrees());
             }else if(bigState.equals("SCORE")){
-                if(!clawOverride){
-                    clawWrist.setClawState(ClawWrist.ClawState.OPEN);
-                }
+                clawOverride = false;
+                clawWrist.setClawState(ClawWrist.ClawState.OPEN);
             }
 
 
@@ -147,9 +146,15 @@ public class teleop extends LinearOpMode {
                 depoFSM = 1;
                 bigState = "INTAKE1";
             }
+
             if(gamepadTwo.dpad_left){
                 clawOverride = true;
-                leftToggle = !leftToggle;
+                if(clawWrist.getStateClaw() == ClawWrist.ClawState.OPEN){
+                    leftToggle = false;
+                }else{
+                    leftToggle = true;
+                }
+//                leftToggle = !leftToggle;
                 if(leftToggle){
                     clawWrist.setClawState(ClawWrist.ClawState.OPENLeft);
                 }else if(!leftToggle){
@@ -157,7 +162,12 @@ public class teleop extends LinearOpMode {
                 }
             }else if(gamepadTwo.dpad_right){
                 clawOverride = true;
-                rightToggle = !rightToggle;
+                if(clawWrist.getStateClaw() == ClawWrist.ClawState.OPEN){
+                    rightToggle = false;
+                }else{
+                    rightToggle = true;
+                }
+//                rightToggle = !rightToggle;
                 if(rightToggle){
                     clawWrist.setClawState(ClawWrist.ClawState.OPENRight);
                 }else if(!rightToggle){
