@@ -159,9 +159,9 @@ public class clawWristTest extends LinearOpMode {
                 clawOverride = true;
                 rightToggle = !rightToggle;
                 if(rightToggle){
-                    clawWrist.setClawState(ClawWrist.ClawState.OPENLeft);
+                    clawWrist.setClawState(ClawWrist.ClawState.OPENRight);
                 }else if(!rightToggle){
-                    clawWrist.setClawState(ClawWrist.ClawState.CLOSEDLeft);
+                    clawWrist.setClawState(ClawWrist.ClawState.CLOSEDRight);
                 }
             }
 //            if(gamepadTwo.left_bumper && !force){
