@@ -166,13 +166,18 @@ public class auto extends LinearOpMode {
                     slidesArm.setInches(1);
                     clawWrist.setClawState(ClawWrist.ClawState.CLOSED);
                     clawWrist.setWristState(ClawWrist.WristState.NEUTRAL);
+
                     if(timeToggle){//timeToggle starts at true by default
                         TimeStamp = timer.milliseconds();
                         timeToggle = false;
                     }
                     if(timer.milliseconds() > TimeStamp + 5000){
                         timeToggle = true;
-                        currentState = State.AFTERPROP;
+                        if(randomization==0){
+                            currentState=State.DEPOSIT;
+                        }else{
+                            currentState = State.AFTERPROP;
+                        }
                     }
                     break;
                 case AFTERPROP:

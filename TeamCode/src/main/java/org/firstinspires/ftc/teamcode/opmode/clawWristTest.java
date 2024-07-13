@@ -33,13 +33,13 @@ public class clawWristTest extends LinearOpMode {
     int armAngle = 130;
     DT drive;
     int depoFSM = 0;
-    boolean clawLForce = false;
-    boolean forceLClawOpen = false;
-    boolean forceLClawClose = false;
 
-    boolean clawRForce = false;
-    boolean forceRClawOpen = false;
-    boolean forceRClawClose = false;
+    int clawL = 0;
+    int clawR = 0;
+    boolean clawOverride = false;
+    boolean leftToggle = false;
+    boolean rightToggle = false;
+
     @Override
     public void runOpMode() throws InterruptedException {
         drive = new DT(hardwareMap);
@@ -64,11 +64,14 @@ public class clawWristTest extends LinearOpMode {
         while (opModeIsActive()){
             drive.setPowers(gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x);
             if(bigState.equals("INTERMEDIATE")){
-                slidesArm.setDegrees(25);
+                slidesArm.setDegrees(20);
                 clawWrist.setWristState(ClawWrist.WristState.NEUTRAL);
-                clawWrist.setClawState(ClawWrist.ClawState.CLOSED);
+                if(!clawOverride){
+                    clawWrist.setClawState(ClawWrist.ClawState.CLOSED);
+                }
                 slidesArm.setInches(1);
             }else if(bigState.equals("INTAKE1")){
+                clawOverride = false;
                 slidesArm.setDegrees(15);
                 clawWrist.setWristState(ClawWrist.WristState.INTAKE);
                 if(timeToggle){//timeToggle starts at true by default
@@ -111,43 +114,76 @@ public class clawWristTest extends LinearOpMode {
                 clawWrist.setWristState(ClawWrist.WristState.OUTTAKE);
                 clawWrist.alignBoard(-slidesArm.getCurrentDegrees());
             }else if(bigState.equals("SCORE")){
-                clawWrist.setClawState(ClawWrist.ClawState.OPEN);
+                if(!clawOverride){
+                    clawWrist.setClawState(ClawWrist.ClawState.OPEN);
+                }
             }
 
 
 
+//
+//            if(gamepad.left_bumper){
+//                bigState = "INTAKE1";
+//            }else if(gamepad.right_bumper){
+//                bigState = "INTAKECLOSECLAW";
+//            }
 
-            if(gamepad.left_bumper){
-                bigState = "INTAKE1";
-            }else if(gamepad.right_bumper){
-                bigState = "INTAKECLOSECLAW";
-            }
-
-            if(gamepad.a){
+            if(gamepadTwo.right_bumper){
                 depoFSM++;
                 if(depoFSM==1){
-                    bigState = "ARMFLIP";
+                    bigState = "INTAKE1";
                 }else if(depoFSM == 2){
-                    bigState = "SCORE";
+                    bigState = "INTAKECLOSECLAW";
                 }else if(depoFSM == 3) {
+                    bigState = "ARMFLIP";
+                }else if(depoFSM == 4){
+                    bigState = "SCORE";
+                }else if(depoFSM == 5){
                     bigState = "INTERMEDIATE";
                     depoFSM = 0;
+                }
+            }
+            if(gamepadTwo.left_stick_button){
+                depoFSM = 1;
+                bigState = "INTAKE1";
+            }
+            if(gamepadTwo.dpad_left){
+                clawOverride = true;
+                leftToggle = !leftToggle;
+                if(leftToggle){
+                    clawWrist.setClawState(ClawWrist.ClawState.OPENLeft);
+                }else if(!leftToggle){
+                    clawWrist.setClawState(ClawWrist.ClawState.CLOSEDLeft);
+                }
+            }else if(gamepadTwo.dpad_right){
+                clawOverride = true;
+                rightToggle = !rightToggle;
+                if(rightToggle){
+                    clawWrist.setClawState(ClawWrist.ClawState.OPENLeft);
+                }else if(!rightToggle){
+                    clawWrist.setClawState(ClawWrist.ClawState.CLOSEDLeft);
                 }
             }
 //            if(gamepadTwo.left_bumper && !force){
 //                forceLClawOpen = true;
 //            }
+//            if(gamepadTwo.b){
+//                clawL++;
+//            }
+//            if(clawL > 2){
+//                clawL = 0;
+//            }
             one.setPower(gamepad1.left_trigger-gamepad1.right_trigger);
             two.setPower(gamepad1.left_trigger-gamepad1.right_trigger);
 
-            if(gamepad.dpad_up){
+            if(gamepadTwo.dpad_up){
                 depositExtension+=5;
-            }else if(gamepad.dpad_down){
+            }else if(gamepadTwo.dpad_down){
                 depositExtension-=5;
-            }else if(gamepad.dpad_left)
+            }else if(gamepadTwo.a)
             {
                 armAngle+=10;
-            }else if(gamepad.dpad_right){
+            }else if(gamepadTwo.y){
                 armAngle-=10;
             }
 
@@ -159,6 +195,7 @@ public class clawWristTest extends LinearOpMode {
             gamepad.update();
             clawWrist.update();
             slidesArm.update();
+            gamepadTwo.update();
         }
     }
 }
