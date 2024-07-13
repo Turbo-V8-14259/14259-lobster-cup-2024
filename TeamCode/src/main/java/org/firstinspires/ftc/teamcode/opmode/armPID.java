@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -10,6 +11,8 @@ import org.checkerframework.checker.units.qual.C;
 import org.firstinspires.ftc.teamcode.hardware.SlidesArm;
 @TeleOp
 @Config
+@Disabled
+
 public class armPID extends LinearOpMode {
     public static double degreeTarget = 0;
     @Override

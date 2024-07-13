@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.usefuls.Gamepad.stickyGamepad;
 @TeleOp
+@Disabled
+
 public class clawBounds extends LinearOpMode {
     double targetOne = 0.5;
     double targetTwo = 0.5;

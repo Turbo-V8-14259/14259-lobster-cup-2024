@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @TeleOp
+@Disabled
 public class slidesBounds extends LinearOpMode {
     DcMotorEx slidesMotor;
     DcMotorEx bl;//80.25 inches is -1100 ticks, when i spin motor forward, tick value becomes negative.

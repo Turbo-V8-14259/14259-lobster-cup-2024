@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -17,11 +16,9 @@ import org.firstinspires.ftc.teamcode.hardware.ClawWrist;
 import org.firstinspires.ftc.teamcode.hardware.SlidesArm;
 import org.firstinspires.ftc.teamcode.usefuls.Gamepad.stickyGamepad;
 
-@TeleOp(name = "probably tele")
+@TeleOp(name = "! Teleop")
 @Config
-@Disabled
-
-public class clawWristTest extends LinearOpMode {
+public class teleop extends LinearOpMode {
     int intakeState = 0;
     boolean timeToggle = true;
     double TimeStamp = 0;
