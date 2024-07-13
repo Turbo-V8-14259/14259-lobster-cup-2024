@@ -21,6 +21,8 @@ import java.util.ArrayList;
 
 @TeleOp
 public class AprilTagTest extends LinearOpMode {
+    public static int invX=1;
+    public static int invZ=1;
     static final double FEET_PER_METER = 3.28084;
     final float DECIMATION_HIGH = 3;
     final float DECIMATION_LOW = 2;
@@ -111,13 +113,13 @@ public class AprilTagTest extends LinearOpMode {
 
                         Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
 
-                        double t1 = (Math.PI / 2) - Math.atan2(detection.pose.x, detection.pose.z);
+                        double t1 = (Math.PI / 2) - Math.atan2(detection.pose.x+(2.5f*invX), detection.pose.z+(8.0f*invZ));
 
                         double t2 = Math.toRadians(rot.firstAngle);
 
                         double t3 = (t1 + t2);
 
-                        double c = Math.sqrt(Math.pow(detection.pose.x * FEET_PER_METER, 2) + Math.pow(detection.pose.z * FEET_PER_METER, 2));
+                        double c = Math.sqrt(Math.pow(detection.pose.x+(2.5f*invX) * FEET_PER_METER, 2) + Math.pow(detection.pose.z+(8.0f*invX) * FEET_PER_METER, 2));
 
                         double tx = Math.cos(t3) * c;
 

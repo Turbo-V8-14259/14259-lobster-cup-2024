@@ -25,8 +25,8 @@ public class testOpMode extends LinearOpMode {
         myPortalsList = JavaUtil.makeIntegerList(VisionPortal.makeMultiPortalView(2, VisionPortal.MultiPortalLayout.HORIZONTAL));
         int Portal_1_View_ID = ((Integer) JavaUtil.inListGet(myPortalsList, JavaUtil.AtMode.FROM_START, 0, false)).intValue();
         int Portal_2_View_ID = ((Integer) JavaUtil.inListGet(myPortalsList, JavaUtil.AtMode.FROM_START, 1, false)).intValue();
-        VisionLocalizer visionLocalizer = new VisionLocalizer(fx, fy, cx, cy, hardwareMap, "Webcam 1", Portal_1_View_ID);
-        VisionLocalizer visionLocalizer1 = new VisionLocalizer(fx, fy, cx, cy, hardwareMap, "Webcam 2", Portal_2_View_ID);
+        VisionLocalizer visionLocalizer = new VisionLocalizer(fx, fy, cx, cy, hardwareMap, "Webcam 1", Portal_1_View_ID, 2.5f,8f);
+        VisionLocalizer visionLocalizer1 = new VisionLocalizer(fx, fy, cx, cy, hardwareMap, "Webcam 2", Portal_2_View_ID, 2.5f,8f);
         visionLocalizer.startStreaming();
         waitForStart();
         telemetry.setMsTransmissionInterval(50);

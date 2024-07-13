@@ -30,12 +30,14 @@ public class VisionLocalizer {
     private final HardwareMap hardwareMap;
     private final String camName;
     private final int id;
+    private final float ox;
+    private final float oz;
     // UNITS ARE METERS
     double tagsize = 0.2286;
     int numFramesWithoutDetection = 0;
 
 
-    public VisionLocalizer(double fx, double fy, double cx, double cy, HardwareMap hardwareMap, String camName, int id) {
+    public VisionLocalizer(double fx, double fy, double cx, double cy, HardwareMap hardwareMap, String camName, int id, float ox, float oz) {
         AprilTagLibrary curLib = AprilTagGameDatabase.getCenterStageTagLibrary();
         this.fx=fx;
         this.fy=fy;
@@ -44,6 +46,8 @@ public class VisionLocalizer {
         this.hardwareMap=hardwareMap;
         this.camName=camName;
         this.id=id;
+        this.ox=ox;
+        this.oz=oz;
 
 
     }
