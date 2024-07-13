@@ -104,7 +104,7 @@ public class redAuto extends LinearOpMode {
                             TimeStamp = timer.milliseconds();
                             timeToggle = false;
                         }
-                        if (timer.milliseconds() > TimeStamp + 2000) {
+                        if (timer.milliseconds() > TimeStamp + 1000) {
                             timeToggle = true;
                             currentState = State.PIXEL1;
 
@@ -117,7 +117,7 @@ public class redAuto extends LinearOpMode {
                             TimeStamp = timer.milliseconds();
                             timeToggle = false;
                         }
-                        if(timer.milliseconds() > TimeStamp + 2000){
+                        if(timer.milliseconds() > TimeStamp + 1000){
                             timeToggle = true;
                             currentState = State.PIXEL1;
 
@@ -128,7 +128,7 @@ public class redAuto extends LinearOpMode {
                             TimeStamp = timer.milliseconds();
                             timeToggle = false;
                         }
-                        if(timer.milliseconds() > TimeStamp + 5000){
+                        if(timer.milliseconds() > TimeStamp + 1000){
                             timeToggle = true;
                             currentState = State.PIXEL1;
 
@@ -152,7 +152,7 @@ public class redAuto extends LinearOpMode {
                         TimeStamp = timer.milliseconds();
                         timeToggle = false;
                     }
-                    if(timer.milliseconds() > TimeStamp + 5000){
+                    if(timer.milliseconds() > TimeStamp + 2000){
                         timeToggle = true;
                         currentState = State.PIXELDOWN;
                     }
@@ -178,7 +178,7 @@ public class redAuto extends LinearOpMode {
                         TimeStamp = timer.milliseconds();
                         timeToggle = false;
                     }
-                    if(timer.milliseconds() > TimeStamp + 5000){
+                    if(timer.milliseconds() > TimeStamp + 2000){
                         timeToggle = true;
 
                         currentState=State.DEPOSIT;
