@@ -46,24 +46,26 @@ public class blueAuto extends LinearOpMode {
     double TimeStamp = 0;
     ElapsedTime timer = new ElapsedTime();
     State currentState;
-    public static Pose2d startPose = new Pose2d(12,60, Math.toRadians(-90));
+    private Pose2d startPose = new Pose2d(12,60, Math.toRadians(-90));
 
-    public static Pose2d propMiddle = new Pose2d(12, 50,Math.toRadians(-90));
-    public static Pose2d propLeft = new Pose2d(12, 50,Math.toRadians(-70));
-    public static Pose2d propRight = new Pose2d(12, 50,Math.toRadians(-120));
+    private Pose2d propMiddle = new Pose2d(12, 50,Math.toRadians(-90));
+    private Pose2d propLeft = new Pose2d(12, 50,Math.toRadians(-70));
+    private Pose2d propRight = new Pose2d(12, 50,Math.toRadians(-120));
 
-    public static Pose2d boardRight = new Pose2d(33, 26.5,Math.toRadians(-180));
-    public static Pose2d boardMiddle = new Pose2d(33, 29,Math.toRadians(-180));
-    public static Pose2d boardLeft = new Pose2d(33, 37,Math.toRadians(-180));
+    private Pose2d boardRight = new Pose2d(33, 26.5,Math.toRadians(-180));
+    private Pose2d boardMiddle = new Pose2d(33, 29,Math.toRadians(-180));
+    private Pose2d boardLeft = new Pose2d(33, 37,Math.toRadians(-180));
 
-    public static Pose2d park1 = new Pose2d(37,55, Math.toRadians(-180));
-    public static Pose2d park2first = new Pose2d(37,5, Math.toRadians(-180));
+    private Pose2d park1 = new Pose2d(37,55, Math.toRadians(-180));
+    private Pose2d park2first = new Pose2d(37,5, Math.toRadians(-180));
     int intakeExtension = 10;
     public static int armAngle = 145;
     public static int pixelExtendsion = 13;
     public static int pixelMiddleExtension =16;
     public static int depositExtension =6;
     public static int randomization=0;//0:left, 1:middle, 2:right
+    public static int delayAction = 500;
+    public static int delayRun = 1000;
     //if(randomization==0){
     //
     //                    }else if(randomization==1){
@@ -142,7 +144,7 @@ public class blueAuto extends LinearOpMode {
                             TimeStamp = timer.milliseconds();
                             timeToggle = false;
                         }
-                        if (timer.milliseconds() > TimeStamp + 1000) {
+                        if (timer.milliseconds() > TimeStamp + delayRun) {
                             timeToggle = true;
                             currentState = State.PIXEL1;
 
@@ -155,7 +157,7 @@ public class blueAuto extends LinearOpMode {
                             TimeStamp = timer.milliseconds();
                             timeToggle = false;
                         }
-                        if(timer.milliseconds() > TimeStamp + 1000){
+                        if(timer.milliseconds() > TimeStamp + delayRun){
                             timeToggle = true;
                             currentState = State.PIXEL1;
 
@@ -166,7 +168,7 @@ public class blueAuto extends LinearOpMode {
                             TimeStamp = timer.milliseconds();
                             timeToggle = false;
                         }
-                        if(timer.milliseconds() > TimeStamp + 1000){
+                        if(timer.milliseconds() > TimeStamp + delayRun){
                             timeToggle = true;
                             currentState = State.PIXEL1;
 
@@ -190,7 +192,7 @@ public class blueAuto extends LinearOpMode {
                         TimeStamp = timer.milliseconds();
                         timeToggle = false;
                     }
-                    if(timer.milliseconds() > TimeStamp + 2000){
+                    if(timer.milliseconds() > TimeStamp + delayAction){
                         timeToggle = true;
                         currentState = State.PIXELDOWN;
                     }
@@ -201,7 +203,7 @@ public class blueAuto extends LinearOpMode {
                         TimeStamp = timer.milliseconds();
                         timeToggle = false;
                     }
-                    if(timer.milliseconds() > TimeStamp + 1000){
+                    if(timer.milliseconds() > TimeStamp + delayAction){
                         timeToggle = true;
                         currentState = State.PIXELRETRACT;
                     }
@@ -216,7 +218,7 @@ public class blueAuto extends LinearOpMode {
                         TimeStamp = timer.milliseconds();
                         timeToggle = false;
                     }
-                    if(timer.milliseconds() > TimeStamp + 2000){
+                    if(timer.milliseconds() > TimeStamp + delayAction){
                         timeToggle = true;
 
                         currentState=State.DEPOSIT;
@@ -233,7 +235,7 @@ public class blueAuto extends LinearOpMode {
                             TimeStamp = timer.milliseconds();
                             timeToggle = false;
                         }
-                        if(timer.milliseconds() > TimeStamp + 2000){
+                        if(timer.milliseconds() > TimeStamp + delayRun){
                             timeToggle = true;
                             currentState = State.ARMFLIP;
 
@@ -245,7 +247,7 @@ public class blueAuto extends LinearOpMode {
                             TimeStamp = timer.milliseconds();
                             timeToggle = false;
                         }
-                        if(timer.milliseconds() > TimeStamp + 2000){
+                        if(timer.milliseconds() > TimeStamp + delayRun){
                             timeToggle = true;
                             currentState = State.ARMFLIP;
 
@@ -257,7 +259,7 @@ public class blueAuto extends LinearOpMode {
                             TimeStamp = timer.milliseconds();
                             timeToggle = false;
                         }
-                        if(timer.milliseconds() > TimeStamp + 2000){
+                        if(timer.milliseconds() > TimeStamp + delayRun){
                             timeToggle = true;
                             currentState = State.ARMFLIP;
 
@@ -273,7 +275,7 @@ public class blueAuto extends LinearOpMode {
                         TimeStamp = timer.milliseconds();
                         timeToggle = false;
                     }
-                    if(timer.milliseconds() > TimeStamp + 2000){
+                    if(timer.milliseconds() > TimeStamp + delayAction){
                         timeToggle = true;
                         currentState = State.SLIDESOUT;
 
@@ -288,7 +290,7 @@ public class blueAuto extends LinearOpMode {
                         TimeStamp = timer.milliseconds();
                         timeToggle = false;
                     }
-                    if(timer.milliseconds() > TimeStamp + 2000){
+                    if(timer.milliseconds() > TimeStamp + delayAction){
                         timeToggle = true;
                         currentState = State.SCORE;
 
@@ -300,7 +302,7 @@ public class blueAuto extends LinearOpMode {
                         TimeStamp = timer.milliseconds();
                         timeToggle = false;
                     }
-                    if(timer.milliseconds() > TimeStamp + 2000){
+                    if(timer.milliseconds() > TimeStamp + delayAction){
                         timeToggle = true;
                         currentState=State.SCORERETRACT;
 
@@ -316,7 +318,7 @@ public class blueAuto extends LinearOpMode {
                         TimeStamp = timer.milliseconds();
                         timeToggle = false;
                     }
-                    if(timer.milliseconds() > TimeStamp + 2000){
+                    if(timer.milliseconds() > TimeStamp + delayAction){
                         timeToggle = true;
                         if(whichPark){
                             currentState = State.PARK1;
@@ -333,7 +335,7 @@ public class blueAuto extends LinearOpMode {
                         TimeStamp = timer.milliseconds();
                         timeToggle = false;
                     }
-                    if(timer.milliseconds() > TimeStamp + 2000){
+                    if(timer.milliseconds() > TimeStamp + delayRun){
                         timeToggle = true;
                         currentState = State.FINISH;
 
@@ -347,7 +349,7 @@ public class blueAuto extends LinearOpMode {
                         TimeStamp = timer.milliseconds();
                         timeToggle = false;
                     }
-                    if(timer.milliseconds() > TimeStamp + 2000){
+                    if(timer.milliseconds() > TimeStamp + delayRun){
                         timeToggle = true;
                         currentState = State.FINISH;
 
