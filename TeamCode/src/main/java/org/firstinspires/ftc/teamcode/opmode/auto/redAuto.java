@@ -10,10 +10,16 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.posePID2.DT;
 import org.firstinspires.ftc.teamcode.hardware.ClawWrist;
 import org.firstinspires.ftc.teamcode.hardware.SlidesArm;
 import org.firstinspires.ftc.teamcode.usefuls.Gamepad.stickyGamepad;
+import org.firstinspires.ftc.teamcode.vision.CameraPipelineRed;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvWebcam;
 
 
 @Autonomous
@@ -68,6 +74,9 @@ public class redAuto extends LinearOpMode {
     //                    }else{
     //
     //                    }
+    private String ObjectDirection;
+    private double thresh = CameraPipelineRed.perThreshold;
+    public static String color = "RED";
     public static boolean whichPark=true; //true right of backboard, false left of backboard
     @Override
     public void runOpMode() throws InterruptedException {
@@ -78,6 +87,22 @@ public class redAuto extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         currentState = State.PROP;
 
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        OpenCvWebcam camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 2"), cameraMonitorViewId);
+        CameraPipelineRed coneDetectionPipeline = new CameraPipelineRed(telemetry);
+        camera.setPipeline(coneDetectionPipeline);
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                camera.startStreaming(864, 480, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode) {
+
+            }
+        });
+
         while(opModeInInit()){
             if(gamepad1.left_bumper){//park left of the board
                 whichPark=false;
@@ -85,6 +110,21 @@ public class redAuto extends LinearOpMode {
             if(gamepad1.right_bumper){
                 whichPark=true;
             }
+
+            ObjectDirection = CameraPipelineRed.randomization(thresh);
+            telemetry.addLine(ObjectDirection);
+
+            if (ObjectDirection == "LEFT") {
+                randomization = 0;
+            } else if (ObjectDirection == "MIDDLE") {
+                randomization = 1;
+            } else if (ObjectDirection == "RIGHT") {
+                randomization = 2;
+            }
+            telemetry.addLine("randomization: " + randomization);
+            telemetry.update();
+
+
             slidesArm.setDegrees(30);
             clawWrist.setWristState(ClawWrist.WristState.NEUTRAL);
             clawWrist.setClawState(ClawWrist.ClawState.CLOSED);
@@ -93,6 +133,8 @@ public class redAuto extends LinearOpMode {
             clawWrist.update();
             //camera opencv pipeline
         }
+        camera.stopStreaming();
+        waitForStart();
 
         while(opModeIsActive()){
             switch(currentState){
