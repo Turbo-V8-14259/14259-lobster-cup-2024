@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.vision;
 
+import com.acmerobotics.dashboard.config.Config;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -11,17 +13,17 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.Objects;
-
+@Config
 public class CameraPipelineRed extends OpenCvPipeline
 {
-    private static double rx1l=1;
-    private static double ry1l=1.3;
-    private static double rx2l=0.9;
-    private static double ry2l=3.5;
-    private static double rx1r=4;
-    private static double ry1r=4.5;
-    private static double rx2r=1.2;
-    private static double ry2r=2;
+    public static double rx1l=1.3;
+    public static double ry1l=1.3;
+    public static double rx2l=0.85;
+    public static double ry2l=3.5;
+    public static double rx1r=4;
+    public static double ry1r=4.5;
+    public static double rx2r=1.2;
+    public static double ry2r=2;
     private static double bx1l=0.4;
     private static double by1l=1.4;
     private static double bx2l=2.2;

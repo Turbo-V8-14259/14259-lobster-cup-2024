@@ -25,13 +25,15 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 @Autonomous
 @Config
-public class blueAuto extends LinearOpMode {
+public class farBlueAuto extends LinearOpMode {
 
     enum State {
         PROP,
         PIXEL1,
         PIXELDOWN,
         PIXELRETRACT,
+        TRAVEL,
+        TRAVELINTERMEDIATE,
         DEPOSIT,
         ARMFLIP,
         SLIDESOUT,
@@ -46,15 +48,14 @@ public class blueAuto extends LinearOpMode {
     boolean timeToggle = true;
     double TimeStamp = 0;
     ElapsedTime timer = new ElapsedTime();
-    ElapsedTime timer2 = new ElapsedTime();
-
     State currentState;
-    public static Pose2d startPose = new Pose2d(12,60, Math.toRadians(-90));
+    public static Pose2d startPose = new Pose2d(-38,60, Math.toRadians(-90));
 
-    public static Pose2d propMiddle = new Pose2d(12, 50,Math.toRadians(-95));
-    public static Pose2d propLeft = new Pose2d(12, 50,Math.toRadians(-75));
-    public static Pose2d propRight = new Pose2d(12, 50,Math.toRadians(-127.5));
-
+    public static Pose2d propMiddle = new Pose2d(-38, 50,Math.toRadians(-95));
+    public static Pose2d propLeft = new Pose2d(-38, 50,Math.toRadians(-75));
+    public static Pose2d propRight = new Pose2d(-38, 50,Math.toRadians(-127.5));
+    Pose2d travelIntermediate = new Pose2d(-38, 55,Math.toRadians(-180));
+    Pose2d travel = new Pose2d(20, 52,Math.toRadians(-180));
     public static Pose2d boardRight = new Pose2d(38, 25.5,Math.toRadians(-180));
     public static Pose2d boardMiddle = new Pose2d(38, 31,Math.toRadians(-180));
     public static Pose2d boardLeft = new Pose2d(38, 37,Math.toRadians(-180));
@@ -81,7 +82,9 @@ public class blueAuto extends LinearOpMode {
     public static String color = "RED";
     public static int delayAction = 750;
     public static int delayRun = 1000;
+    public static int delayTravel=3000;
     public static boolean whichPark=true; //true right of backboard, false left of backboard
+    ElapsedTime timer2 = new ElapsedTime();
     @Override
     public void runOpMode() throws InterruptedException {
         drive = new DT(hardwareMap, new Pose2d(startPose.getX(), startPose.getY(), startPose.getHeading()), timer);
@@ -232,10 +235,40 @@ public class blueAuto extends LinearOpMode {
                     if(timer.milliseconds() > TimeStamp + delayAction){
                         timeToggle = true;
 
-                        currentState=State.DEPOSIT;
+                        currentState=State.TRAVELINTERMEDIATE;
                     }
 
 
+                    break;
+                case TRAVELINTERMEDIATE:
+
+                    drive.lineTo(travelIntermediate.getX(), travelIntermediate.getY(), travelIntermediate.getHeading());
+
+                    if(timeToggle){//timeToggle starts at true by default
+                        TimeStamp = timer.milliseconds();
+                        timeToggle = false;
+                    }
+                    if(timer.milliseconds() > TimeStamp + delayRun){
+                        timeToggle = true;
+
+                        currentState= State.TRAVEL;
+                    }
+
+
+                    break;
+                case TRAVEL:
+
+                    drive.lineTo(travel.getX(), travel.getY(), travel.getHeading());
+
+                    if(timeToggle){//timeToggle starts at true by default
+                        TimeStamp = timer.milliseconds();
+                        timeToggle = false;
+                    }
+                    if(timer.milliseconds() > TimeStamp + delayTravel){
+                        timeToggle = true;
+
+                        currentState= State.DEPOSIT;
+                    }
                     break;
 
                 case DEPOSIT:

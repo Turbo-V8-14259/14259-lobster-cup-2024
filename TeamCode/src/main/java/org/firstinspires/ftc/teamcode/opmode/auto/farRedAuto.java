@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.hardware.ClawWrist;
 import org.firstinspires.ftc.teamcode.hardware.SATest;
 import org.firstinspires.ftc.teamcode.hardware.SlidesArm;
 import org.firstinspires.ftc.teamcode.usefuls.Gamepad.stickyGamepad;
-import org.firstinspires.ftc.teamcode.vision.CameraPipelineBlue;
+import org.firstinspires.ftc.teamcode.vision.CameraPipelineRed;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -25,13 +25,15 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 @Autonomous
 @Config
-public class blueAuto extends LinearOpMode {
+public class farRedAuto extends LinearOpMode {
 
     enum State {
         PROP,
         PIXEL1,
         PIXELDOWN,
         PIXELRETRACT,
+        TRAVELINTERMEDIATE,
+        TRAVEL,
         DEPOSIT,
         ARMFLIP,
         SLIDESOUT,
@@ -46,27 +48,25 @@ public class blueAuto extends LinearOpMode {
     boolean timeToggle = true;
     double TimeStamp = 0;
     ElapsedTime timer = new ElapsedTime();
-    ElapsedTime timer2 = new ElapsedTime();
-
     State currentState;
-    public static Pose2d startPose = new Pose2d(12,60, Math.toRadians(-90));
+    Pose2d startPose = new Pose2d(-35,-60, Math.toRadians(90));
 
-    public static Pose2d propMiddle = new Pose2d(12, 50,Math.toRadians(-95));
-    public static Pose2d propLeft = new Pose2d(12, 50,Math.toRadians(-75));
-    public static Pose2d propRight = new Pose2d(12, 50,Math.toRadians(-127.5));
+    Pose2d propMiddle = new Pose2d(-35, -50,Math.toRadians(90));
+    Pose2d propLeft = new Pose2d(-35, -50,Math.toRadians(125));
+    Pose2d propRight = new Pose2d(-35, -50,Math.toRadians(75));
+    Pose2d travelIntermediate = new Pose2d(-35, -55,Math.toRadians(180));
+    Pose2d travel = new Pose2d(20, -52,Math.toRadians(180));
+    Pose2d boardLeft = new Pose2d(35, -26.5,Math.toRadians(180));
+    Pose2d boardMiddle = new Pose2d(35, -29,Math.toRadians(180));
+    Pose2d boardRight = new Pose2d(35, -37,Math.toRadians(180));
 
-    public static Pose2d boardRight = new Pose2d(38, 25.5,Math.toRadians(-180));
-    public static Pose2d boardMiddle = new Pose2d(38, 31,Math.toRadians(-180));
-    public static Pose2d boardLeft = new Pose2d(38, 37,Math.toRadians(-180));
-
-    public static Pose2d park1 = new Pose2d(45,55, Math.toRadians(-180));
-    public static Pose2d park2first = new Pose2d(37,5, Math.toRadians(-180));
-    public static Pose2d park2last = new Pose2d(45,5, Math.toRadians(-180));
-
+    Pose2d park1 = new Pose2d(45,-55, Math.toRadians(180));
+    Pose2d park2first = new Pose2d(37,-5, Math.toRadians(180));
+    Pose2d park2last = new Pose2d(45,-5, Math.toRadians(180));
     int intakeExtension = 10;
     public static int armAngle = 145;
     public static int pixelExtendsion = 12;
-    public static int pixelMiddleExtension =16;
+    public static int pixelMiddleExtension =15;
     public static int depositExtension =8;
     public static int randomization=0;//0:left, 1:middle, 2:right
     //if(randomization==0){
@@ -77,10 +77,13 @@ public class blueAuto extends LinearOpMode {
     //
     //                    }
     private String ObjectDirection;
-    private double thresh = CameraPipelineBlue.perThreshold;
-    public static String color = "RED";
-    public static int delayAction = 750;
+    public static int delayAction = 760;
     public static int delayRun = 1000;
+    public static int delayTravel = 5000;
+    ElapsedTime timer2 = new ElapsedTime();
+
+    private double thresh = CameraPipelineRed.perThreshold;
+    public static String color = "RED";
     public static boolean whichPark=true; //true right of backboard, false left of backboard
     @Override
     public void runOpMode() throws InterruptedException {
@@ -90,9 +93,10 @@ public class blueAuto extends LinearOpMode {
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         currentState = State.PROP;
+
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         OpenCvWebcam camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 2"), cameraMonitorViewId);
-        CameraPipelineBlue coneDetectionPipeline = new CameraPipelineBlue(telemetry);
+        CameraPipelineRed coneDetectionPipeline = new CameraPipelineRed(telemetry);
         camera.setPipeline(coneDetectionPipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
@@ -106,25 +110,18 @@ public class blueAuto extends LinearOpMode {
             }
         });
 
-
-
-        while(opModeInInit())
-        {
-            if(gamepad1.left_bumper){//park right of the board
+        while(opModeInInit()){
+            if(gamepad1.left_bumper){//park left of the board
                 whichPark=false;
             }
             if(gamepad1.right_bumper){
                 whichPark=true;
             }
-            if(whichPark){
-                telemetry.addData("park", "side of the board");
-            }else{
-                telemetry.addData("park", "center of the field");
-            }
-            ObjectDirection = CameraPipelineBlue.randomization(thresh);
+
+            ObjectDirection = CameraPipelineRed.randomization(thresh);
             telemetry.addLine(ObjectDirection);
 
-            if (ObjectDirection == "LEFT") {//camera opencv pipeline
+            if (ObjectDirection == "LEFT") {
                 randomization = 0;
             } else if (ObjectDirection == "MIDDLE") {
                 randomization = 1;
@@ -132,14 +129,22 @@ public class blueAuto extends LinearOpMode {
                 randomization = 2;
             }
             telemetry.addLine("randomization: " + randomization);
+            if(whichPark){
+                telemetry.addData("park", "center of the board");
+            }else{
+                telemetry.addData("park", "side of the board");
+            }
+
             telemetry.update();
+
+
             slidesArm.setDegrees(30);
             clawWrist.setWristState(ClawWrist.WristState.NEUTRAL);
             clawWrist.setClawState(ClawWrist.ClawState.CLOSED);
             slidesArm.setInches(0);
             slidesArm.update();
             clawWrist.update();
-
+            //camera opencv pipeline
         }
         camera.stopStreaming();
         waitForStart();
@@ -147,7 +152,6 @@ public class blueAuto extends LinearOpMode {
         while(opModeIsActive()){
             switch(currentState){
                 case PROP:
-                    clawWrist.setWristState(ClawWrist.WristState.INTAKE);
                     if(randomization==0) {
                         drive.lineTo(propLeft.getX(), propLeft.getY(), propLeft.getHeading());
 
@@ -190,13 +194,12 @@ public class blueAuto extends LinearOpMode {
                     break;
                 case PIXEL1:
                     slidesArm.setDegrees(15);
-
+                    clawWrist.setWristState(ClawWrist.WristState.INTAKE);
                     if(randomization==1){
                         slidesArm.setInches(pixelMiddleExtension);
                     }else{
                         slidesArm.setInches(pixelExtendsion);
                     }
-
 
 
                     if(timeToggle){//timeToggle starts at true by default
@@ -232,10 +235,40 @@ public class blueAuto extends LinearOpMode {
                     if(timer.milliseconds() > TimeStamp + delayAction){
                         timeToggle = true;
 
-                        currentState=State.DEPOSIT;
+                        currentState=State.TRAVELINTERMEDIATE;
                     }
 
 
+                    break;
+                case TRAVELINTERMEDIATE:
+
+                    drive.lineTo(travelIntermediate.getX(), travelIntermediate.getY(), travelIntermediate.getHeading());
+
+                    if(timeToggle){//timeToggle starts at true by default
+                        TimeStamp = timer.milliseconds();
+                        timeToggle = false;
+                    }
+                    if(timer.milliseconds() > TimeStamp + delayRun){
+                        timeToggle = true;
+
+                        currentState=State.TRAVEL;
+                    }
+
+
+                    break;
+                case TRAVEL:
+
+                    drive.lineTo(travel.getX(), travel.getY(), travel.getHeading());
+
+                    if(timeToggle){//timeToggle starts at true by default
+                        TimeStamp = timer.milliseconds();
+                        timeToggle = false;
+                    }
+                    if(timer.milliseconds() > TimeStamp + delayTravel){
+                        timeToggle = true;
+
+                        currentState=State.DEPOSIT;
+                    }
                     break;
 
                 case DEPOSIT:

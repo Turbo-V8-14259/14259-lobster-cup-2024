@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.usefuls.Motor.PID;
 
 
 @Config
-public class SlidesArm {
+public class SATest {
     public enum SlideState {
         RETRACTED,
         INTAKE,
@@ -45,9 +45,12 @@ public class SlidesArm {
     public static double aKp = 5, aKi = 0, aKd = 0;
     private boolean lowering = false;
     private double targetAngle=0;
+    private double pastDegrees=0;
+    ElapsedTime timer = new ElapsedTime();
 
 
-    public SlidesArm(HardwareMap hardwareMap){
+    public SATest(HardwareMap hardwareMap, ElapsedTime timer){
+        this.timer = timer;
         s = new DcMotorBetter(hardwareMap.get(DcMotorEx.class, "s"));
         a = new DcMotorBetter(hardwareMap.get(DcMotorEx.class, "a"));
         a.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -68,7 +71,7 @@ public class SlidesArm {
                 });
 
     }
-    public SlidesArm stopAndResetEncoder() {
+    public SATest stopAndResetEncoder() {
         this.br.stopAndResetEncoder();
         this.bl.stopAndResetEncoder();
         return this;
@@ -99,9 +102,17 @@ public class SlidesArm {
     public double getCurrentInches() {
         return  (getCurrentSlidesPosition()/INCHES_TO_TICKS) * S_UPPER_BOUND;
     }
+
+    //
+
     public double getTargetAngle(){
         return targetAngle;
     }
+
+    double previousTime = 0;
+    double previousError = 0;
+    double armSpeed = 0;
+    public static double kd = 150;
     public void update(){
         linSlideController.update();
         if(getTargetAngle()==0)
@@ -110,9 +121,9 @@ public class SlidesArm {
         }else{
             lowering=false;
         }
-        error = -1 * getCurrentArmPosition()-targetArmPosition ;
-
-        double armPower = kp*error;
+        error = -1 * getCurrentArmPosition()-targetArmPosition;
+        armSpeed = -(error - previousError)/ (timer.milliseconds() - previousTime);
+        double armPower = kp*error - kd * armSpeed;
         if(getCurrentDegrees() < 85 && armPower > .2&&lowering){
             armPower = 0;
         }
@@ -122,6 +133,11 @@ public class SlidesArm {
 
         a.update();
         s.update();
+        previousTime = timer.milliseconds();
+        previousError = error;
+    }
+    public double getArmSpeed(){
+        return armSpeed;
     }
 
 }

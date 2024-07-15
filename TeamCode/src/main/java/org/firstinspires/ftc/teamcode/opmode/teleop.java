@@ -9,10 +9,12 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.posePID2.DT;
 import org.firstinspires.ftc.teamcode.hardware.ClawWrist;
+import org.firstinspires.ftc.teamcode.hardware.SATest;
 import org.firstinspires.ftc.teamcode.hardware.SlidesArm;
 import org.firstinspires.ftc.teamcode.usefuls.Gamepad.stickyGamepad;
 
@@ -34,9 +36,11 @@ public class teleop extends LinearOpMode {
     boolean clawOverride = false;
     boolean leftToggle = false;
     boolean rightToggle = false;
+    ElapsedTime time = new ElapsedTime();
 
     @Override
     public void runOpMode() throws InterruptedException {
+        Servo drone = hardwareMap.get(Servo.class, "drone");
         drive = new DT(hardwareMap);
         CRServo one = hardwareMap.get(CRServo.class, "hl"); //works port1
         CRServo two = hardwareMap.get(CRServo.class, "hr");
@@ -44,11 +48,11 @@ public class teleop extends LinearOpMode {
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         ClawWrist clawWrist = new ClawWrist(hardwareMap);
-        SlidesArm slidesArm = new SlidesArm(hardwareMap);
+        SATest slidesArm = new SATest(hardwareMap, time);
 
         stickyGamepad gamepad = new stickyGamepad(gamepad1);
         stickyGamepad gamepadTwo = new stickyGamepad(gamepad2);
-
+        drone.setPosition(1);
 //        armMotor = hardwareMap.get(DcMotorEx.class, "a");
 //        armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 //        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -57,9 +61,13 @@ public class teleop extends LinearOpMode {
 //        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         waitForStart();
         while (opModeIsActive()){
-            drive.setPowers(gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x);
+            if(bigState.equals("ARMFLIP")|| bigState.equals("SLIDESOUT")){
+                drive.setPowers(gamepad1.left_stick_x * .6, -gamepad1.left_stick_y * .6, -gamepad1.right_stick_x * .6);
+            }else{
+                drive.setPowers(gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x);
+            }
             if(bigState.equals("INTERMEDIATE")){
-                slidesArm.setDegrees(25);
+                slidesArm.setDegrees(20);
                 clawWrist.setWristState(ClawWrist.WristState.NEUTRAL);
 //                if(!clawOverride){
 //                    clawWrist.setClawState(ClawWrist.ClawState.CLOSED);
@@ -126,15 +134,24 @@ public class teleop extends LinearOpMode {
 //            }else if(gamepad.right_bumper){
 //                bigState = "INTAKECLOSECLAW";
 //            }
-
+            if(gamepad.right_bumper && depoFSM == 2){
+                if(depoFSM == 2){
+                    depoFSM++;
+                }
+                bigState = "ARMFLIP";
+//                gamepad2.rumble(500);
+//                gamepad1.rumble(500);
+            }
             if(gamepadTwo.right_bumper){
-                depoFSM++;
+//                gamepad2.rumble(500);
+//                gamepad1.rumble(500);
+                if(!(depoFSM == 2)){
+                    depoFSM++;
+                }
                 if(depoFSM==1){
                     bigState = "INTAKE1";
                 }else if(depoFSM == 2){
                     bigState = "INTAKECLOSECLAW";
-                }else if(depoFSM == 3) {
-                    bigState = "ARMFLIP";
                 }else if(depoFSM == 4){
                     bigState = "SCORE";
                 }else if(depoFSM == 5){
@@ -183,6 +200,9 @@ public class teleop extends LinearOpMode {
 //            if(clawL > 2){
 //                clawL = 0;
 //            }
+            if(gamepad.a){
+                drone.setPosition(0);
+            }
             one.setPower(gamepad1.left_trigger-gamepad1.right_trigger);
             two.setPower(gamepad1.left_trigger-gamepad1.right_trigger);
 
