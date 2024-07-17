@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.usefuls.Gamepad.stickyGamepad;
 
 @TeleOp (name = "Debug PP")
 @Config
-public class DebugTest extends LinearOpMode {
+public class pathtest extends LinearOpMode {
     ElapsedTime timer = new ElapsedTime();
     double previousTime = 0;
     double currentTime = 0;
@@ -35,8 +35,8 @@ public class DebugTest extends LinearOpMode {
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         drive.setFollowRadius(lookaheadRadius);
-        DebugUtil.updateSegment(1);
-        DebugUtil.updateEnding(false);
+        PurePursuitUtil.updateSegment(1);
+        PurePursuitUtil.updateEnding(false);
         drive.setOn(true);
         gamepadOne = new stickyGamepad(gamepad1);
         waitForStart();
@@ -52,8 +52,10 @@ public class DebugTest extends LinearOpMode {
             }
             ArrayList<Pose2d> wayPoints = new ArrayList<>();
             wayPoints.add(new Pose2d(0, 0));
-            wayPoints.add(new Pose2d(0, 60));
-            wayPoints.add(new Pose2d(20, 0));
+            wayPoints.add(new Pose2d(0, 50));
+            wayPoints.add(new Pose2d(50, 50));
+            wayPoints.add(new Pose2d(50, 0));
+            wayPoints.add(new Pose2d(0, 0));
             followPath(wayPoints, 1, 13, 13, 0, -99, drive);
 //            wayPoints.add(new Pose2d(50, 60));
 //
@@ -75,7 +77,7 @@ public class DebugTest extends LinearOpMode {
             telemetry.addData("size", size);
 
 
-            telemetry.addData("segment ", DebugUtil.getSegment());
+            telemetry.addData("segment ", PurePursuitUtil.getSegment());
             telemetry.update();
 
             drive.update();
@@ -90,14 +92,14 @@ public class DebugTest extends LinearOpMode {
     public void followPath(ArrayList<Pose2d> path, double movePower, double headingRadius, double moveRadius, double headingOffset, double lockAngle, DT drive) {
         //false for urm non heading ig
         //getFuturePos for vel extrapolation
-        Pose2d followDrive = DebugUtil.followMe(path, drive.getFuturePos(500), moveRadius, lastTranslatePoint, false);
+        Pose2d followDrive = PurePursuitUtil.followMe(path, drive.getFuturePos(500), moveRadius, lastTranslatePoint, false);
         lastTranslatePoint = followDrive;
 
         //true for heading
 
-        Pose2d followHeading = DebugUtil.followMe(path, drive.getFuturePos(500), headingRadius, lastHeadingPoint, true);
+        Pose2d followHeading = PurePursuitUtil.followMe(path, drive.getFuturePos(500), headingRadius, lastHeadingPoint, true);
         lastHeadingPoint = followHeading;
-        if(DebugUtil.getEnding()) {
+        if(PurePursuitUtil.getEnding()) {
             drive.setPathEndHold(true);
             drive.lineTo(followDrive.getX(), followDrive.getY(),Math.toRadians(-180));
         }else{

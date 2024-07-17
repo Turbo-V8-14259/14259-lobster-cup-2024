@@ -7,7 +7,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 import java.util.ArrayList;
 
-public class DebugUtil {
+public class PurePursuitUtil {
 
     private static int segment = 1;
 
