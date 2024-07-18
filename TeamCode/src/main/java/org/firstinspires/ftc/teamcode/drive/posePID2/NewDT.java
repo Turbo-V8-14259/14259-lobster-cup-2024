@@ -134,6 +134,7 @@ public class NewDT{
 
         xVelocity = deltaX / deltaTime;
         yVelocity = deltaY / deltaTime;
+        turnVelocity = deltaR / deltaTime;
         //for velocity extrapolation, make sure they are in the right direction and right units
 
 
