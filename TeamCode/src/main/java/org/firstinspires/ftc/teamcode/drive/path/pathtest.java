@@ -56,7 +56,7 @@ public class pathtest extends LinearOpMode {
             wayPoints.add(new Pose2d(50, 50));
             wayPoints.add(new Pose2d(50, 0));
             wayPoints.add(new Pose2d(0, 0));
-            followPath(wayPoints, 1, 13, 13, 0, -99, drive);
+            followPath(wayPoints, 1, 30, 30, 0, -99, drive);
 //            wayPoints.add(new Pose2d(50, 60));
 //
 //            wayPoints.add(new Pose2d(70, 30));

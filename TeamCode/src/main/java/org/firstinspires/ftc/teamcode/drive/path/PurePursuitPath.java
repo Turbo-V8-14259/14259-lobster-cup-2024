@@ -34,12 +34,12 @@ public class PurePursuitPath {
     public void update() {
         //false for urm non heading ig
         //getFuturePos for vel extrapolation
-        Pose2d followDrive = PurePursuitUtil.followMe(wayPoints, drive.getLocation(), moveRadius, lastTranslatePoint, false);
+        Pose2d followDrive = PurePursuitUtil.followMe(wayPoints, drive.getFuturePos(500), moveRadius, lastTranslatePoint, false);
         lastTranslatePoint = followDrive;
 
         //true for heading
 
-        Pose2d followHeading = PurePursuitUtil.followMe(wayPoints, drive.getLocation(), headingRadius, lastHeadingPoint, true);
+        Pose2d followHeading = PurePursuitUtil.followMe(wayPoints, drive.getFuturePos(500), headingRadius, lastHeadingPoint, true);
         lastHeadingPoint = followHeading;
         if(PurePursuitUtil.getEnding()) {
             drive.setPathEndHold(true);

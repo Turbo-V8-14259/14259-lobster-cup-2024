@@ -142,10 +142,6 @@ public class PurePursuitUtil {
                 allIntersections.add(intersections.get(0));
             }
 
-
-
-
-
         }else{
             Pose2d wayPt1 = path.get(segment-1);
             Pose2d wayPt2 = path.get(segment);

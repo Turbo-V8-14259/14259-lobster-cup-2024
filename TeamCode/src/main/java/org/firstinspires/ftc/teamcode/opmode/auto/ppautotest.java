@@ -33,14 +33,16 @@ public class ppautotest extends LinearOpMode {
     double movePower =1;
     double headingOffset=0;
     public static double moveRadius = 5;
-    public static double headingRadius = 13;
+    public static double headingRadius = 5;
     @Override
     public void runOpMode() throws InterruptedException {
-        drive = new DT(hardwareMap, new Pose2d(0, 0, 0), timer);
+        drive = new DT(hardwareMap);
         path = new PurePursuitPath(drive,moveRadius, headingRadius,
-        new Pose2d(0,0, Math.toRadians(0)),
-        new Pose2d(12,30, Math.toRadians(90)),
-        new Pose2d(30,-60, Math.toRadians(90))
+        new Pose2d(0, 0),
+        new Pose2d(0, 50),
+        new Pose2d(5, 50),
+        new Pose2d(5, 0)
+
                 );
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
