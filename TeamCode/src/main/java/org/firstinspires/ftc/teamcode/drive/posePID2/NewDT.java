@@ -33,9 +33,6 @@ public class NewDT{
 
     private boolean purePersuiting = false;
 
-    private BasicPID xController, yController, rController, pprController, NxController, NyController;
-    private PIDCoefficients xyCoeff, rCoeff, pprCoeff, NxyCoeff;
-
     private double xOut, yOut, rOut;
     private double twistedR, count, lastAngle;
     private double xPower, yPower;
