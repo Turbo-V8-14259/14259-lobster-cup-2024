@@ -17,7 +17,7 @@ public class lineToTest extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();
         while(opModeIsActive()){
-            drive.lineTo(0,0,Math.toRadians(90));
+            drive.lineTo(0,20,Math.toRadians(90));
             drive.update();
             telemetry.addData("x: ", drive.getX());
             telemetry.addData("y: ", drive.getY());

@@ -52,9 +52,9 @@ public class NewDT{
     double xVelocity=0;
     double yVelocity = 0;
     public static double rkp=1.3;
-    public static double xykp = 0.075;
+    public static double xykp = 0.9;
     public static double xykd = 0;
-    public static double rkd=0;
+    public static double rkd=0.0008;
 
     double deltaRRateOfChange = 0;
     double lastDeltaR = 0;
@@ -107,7 +107,7 @@ public class NewDT{
         }
     }
     public void update(){
-        deltaTime = timer.nanoseconds() - lastTime;
+        deltaTime = timeWrapper(timer.nanoseconds()) - lastTime;
         //change in time
 
         drive.updatePoseEstimate();
@@ -163,7 +163,12 @@ public class NewDT{
         xPower = (xOut * T.cos(rRn) - yOut * T.sin(rRn));
         yPower = (xOut * T.sin(rRn) + yOut * T.cos(rRn));
         //rotation matrix
-
+        if (Math.abs(xPower) > DTConstants.maxAxialPower)
+            xPower = DTConstants.maxAxialPower * Math.signum(xPower);
+        if (Math.abs(yPower) > DTConstants.maxAxialPower)
+            yPower = DTConstants.maxAxialPower * Math.signum(yPower);
+        if (Math.abs(rOut) > DTConstants.maxAngularPower)
+            rOut = DTConstants.maxAngularPower * Math.signum(rOut);
 
 
         double zeroMoveAngle = Math.toRadians(25);
@@ -177,13 +182,13 @@ public class NewDT{
 
 
 
-        setPowers(yPower * maxPower, xPower * maxPower, -rOut);
+        setPowers(0, 0, -rOut);
         //actually sets power to the motor
 
 
 
 
-        lastTime = timer.nanoseconds();
+        lastTime = timeWrapper(timer.nanoseconds());
         lastDeltaR = deltaR;
         lastDeltaX = deltaX;
         lastDeltaY = deltaY;
@@ -194,6 +199,9 @@ public class NewDT{
     public void setPurePersuiting(boolean isPurePersuiting){
         purePersuiting = isPurePersuiting;
     }
+    public double timeWrapper(double nano){
+        return nano/1000000000;
+    }
     public Pose2d getLocation(){
         return new Pose2d(xRn, yRn, rRn);
     }
@@ -202,6 +210,9 @@ public class NewDT{
     }
     public double getCurrentTime(){
         return currentTime;
+    }
+    public double getTimer(){
+        return timer.nanoseconds();
     }
     public void setYTarget(double y){
         this.yTarget = y;

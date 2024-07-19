@@ -7,16 +7,17 @@ import org.firstinspires.ftc.teamcode.drive.posePID2.NewDT;
 
 import java.util.ArrayList;
 import java.util.Collections;
-public class PurePursuitPath {
+
+public class PurePursuitPath2 {
     private ArrayList<Pose2d> wayPoints = new ArrayList<>();
-    private NewDT drive;
+    private DT drive;
     private double moveRadius, headingRadius;
     private Pose2d lastTranslatePoint = new Pose2d(0,0);
     private Pose2d lastHeadingPoint = new Pose2d(0,0);
     private double movePower;
     private double headingOffset;
     private boolean velextra = false;
-    public PurePursuitPath(NewDT drive, double moveRadius, double headingRadius, Pose2d... ws){
+    public PurePursuitPath2(DT drive, double moveRadius, double headingRadius, Pose2d... ws){
         this.drive = drive;
         Collections.addAll(wayPoints, ws);
         this.moveRadius = moveRadius;
@@ -38,6 +39,9 @@ public class PurePursuitPath {
     }
     public boolean getVelExtra(){
         return velextra;
+    }
+    public void setMovePower(double movePower){
+        this.movePower = movePower;
     }
     public void update() {
         Pose2d followDrive, followHeading;
