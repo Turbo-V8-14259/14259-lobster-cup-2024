@@ -51,8 +51,9 @@ public class NewDT{
 
     double xVelocity=0;
     double yVelocity = 0;
-    public static double rkp=1.3;
-    public static double xykp = 0.9;
+    public static double rkp=1.0;
+    public static double xykp = 0.075;
+    double pathController;
     public static double xykd = 0;
     public static double rkd=0.0008;
 
@@ -66,7 +67,13 @@ public class NewDT{
     double lastDeltaY = 0;
 
     double deltaTime = 0;
-
+    double pathLength=0;
+    double lastPathLength=0;
+    double deltaPathRateOfChange=0;
+    public static double pkp = 0.13;
+    public static double pkd =0.0005;
+    public static double yMultiplier = 1.3;
+    public static double xMultiplier = 1;
 
     public NewDT(HardwareMap hardwareMap, Pose2d startPose, ElapsedTime timer){
         this.timer = timer;
@@ -124,12 +131,14 @@ public class NewDT{
         deltaR = -1 * (rTarget - twistedR);
         deltaX = xTarget - xRn;
         deltaY = -1 * (yTarget - yRn);
+
         //deltas
 
 
         deltaRRateOfChange = -1 * (deltaR - lastDeltaR) / (deltaTime);
         deltaYRateOfChange = -1 * (deltaY - lastDeltaY) / (deltaTime);
         deltaXRateOfChange = (deltaX - lastDeltaX) / (deltaTime);
+        deltaPathRateOfChange = (pathLength - lastPathLength)/ (deltaTime);
         //rate of change of deltas (used for derivative in PID)
 
         xVelocity = deltaX / deltaTime;
@@ -140,20 +149,19 @@ public class NewDT{
 
 
         //if statements start
-        if(!ending){
-            //pure persuit
-            xOut = deltaX;
-            yOut = deltaY;
-            //literally gets deltas
 
-            xOut/=followRadius;
-            yOut/=followRadius;
-            //normalizes between 0 and 1 which is what i think the *= follow radius stuff was
-        } else {
-            //pid
-            xOut = (deltaX * xykp - deltaXRateOfChange * xykd);
-            yOut = (deltaY * xykp - deltaYRateOfChange * xykd);
-        }//if statements end
+            //pure persuit
+        xOut = deltaX;
+        yOut = deltaY;
+        //literally gets deltas
+
+        xOut/=followRadius;
+        yOut/=followRadius;
+        pathController = pathLength *pkp + deltaPathRateOfChange*pkd;
+        if(maxPower<pathController){
+            pathController = maxPower;
+
+        }
 
 
 
@@ -163,12 +171,12 @@ public class NewDT{
         xPower = (xOut * T.cos(rRn) - yOut * T.sin(rRn));
         yPower = (xOut * T.sin(rRn) + yOut * T.cos(rRn));
         //rotation matrix
-        if (Math.abs(xPower) > DTConstants.maxAxialPower)
-            xPower = DTConstants.maxAxialPower * Math.signum(xPower);
-        if (Math.abs(yPower) > DTConstants.maxAxialPower)
-            yPower = DTConstants.maxAxialPower * Math.signum(yPower);
-        if (Math.abs(rOut) > DTConstants.maxAngularPower)
-            rOut = DTConstants.maxAngularPower * Math.signum(rOut);
+//        if (Math.abs(xPower) > 1)
+//            xPower = DTConstants.maxAxialPower * Math.signum(xPower);
+//        if (Math.abs(yPower) > 1)
+//            yPower = DTConstants.maxAxialPower * Math.signum(yPower);
+//        if (Math.abs(rOut) > DTConstants.maxAngularPower)
+//            rOut = DTConstants.maxAngularPower * Math.signum(rOut);
 
 
         double zeroMoveAngle = Math.toRadians(25);
@@ -182,7 +190,7 @@ public class NewDT{
 
 
 
-        setPowers(0, 0, -rOut);
+        setPowers(yPower*pathController*yMultiplier, xPower*pathController*xMultiplier, -rOut);
         //actually sets power to the motor
 
 
@@ -192,10 +200,16 @@ public class NewDT{
         lastDeltaR = deltaR;
         lastDeltaX = deltaX;
         lastDeltaY = deltaY;
+        lastPathLength = pathLength;
         //updating the last values
 
     }
-
+    public void setPathLength(double pathLength){
+        this.pathLength = pathLength;
+    }
+    public double getPathController(){
+        return pathController;
+    }
     public void setPurePersuiting(boolean isPurePersuiting){
         purePersuiting = isPurePersuiting;
     }

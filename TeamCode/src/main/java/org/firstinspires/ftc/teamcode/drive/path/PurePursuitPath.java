@@ -16,6 +16,8 @@ public class PurePursuitPath {
     private double movePower;
     private double headingOffset;
     private boolean velextra = false;
+    Pose2d followDrive, followHeading;
+    private double pathLength =0;
     public PurePursuitPath(NewDT drive, double moveRadius, double headingRadius, Pose2d... ws){
         this.drive = drive;
         Collections.addAll(wayPoints, ws);
@@ -25,8 +27,9 @@ public class PurePursuitPath {
 
     public void init(double movePower, double headingOffset){
         drive.setFollowRadius(moveRadius);
-        PurePursuitUtil.updateSegment(1);
-        PurePursuitUtil.updateEnding(false);
+        PurePursuitUtil.updateMoveSegment(1);
+        PurePursuitUtil.updateHeadingSegment(1);
+//        PurePursuitUtil.updateEnding(false);
         drive.setOn(true);
         lastTranslatePoint = wayPoints.get(0);
         lastHeadingPoint = wayPoints.get(0);
@@ -40,7 +43,6 @@ public class PurePursuitPath {
         return velextra;
     }
     public void update() {
-        Pose2d followDrive, followHeading;
         //false for urm non heading ig
         //getFuturePos for vel extrapolation
         if(velextra){
@@ -61,18 +63,32 @@ public class PurePursuitPath {
             followHeading = PurePursuitUtil.followMe(wayPoints, drive.getLocation(), headingRadius, lastHeadingPoint, true);
             lastHeadingPoint = followHeading;
         }
-        if(PurePursuitUtil.getEnding()) {
-            drive.setPathEndHold(true);
-            drive.lineTo(followDrive.getX(), followDrive.getY(),Math.toRadians(-180));
-        }else{
-            drive.lineTo(followDrive.getX(), followDrive.getY(),drive.toPoint(drive.getX(), drive.getY(), drive.getR(), followHeading.getX(), followHeading.getY() + headingOffset));
+
+//        if(PurePursuitUtil.getEnding()) {
+//            drive.setPathEndHold(true);
+//            drive.lineTo(followDrive.getX(), followDrive.getY(),Math.toRadians(-180));
+//        }else{
+        drive.lineTo(followDrive.getX(), followDrive.getY(),drive.toPoint(drive.getX(), drive.getY(), drive.getR(), followHeading.getX(), followHeading.getY() + headingOffset));
+//        }
+        pathLength = Math.hypot((wayPoints.get(PurePursuitUtil.getMoveSegment()).getX()-drive.getX()), (wayPoints.get(PurePursuitUtil.getMoveSegment()).getY()-drive.getY()));
+        for(int i=PurePursuitUtil.getMoveSegment()+1;i<wayPoints.size();i++){
+            pathLength += Math.hypot((wayPoints.get(i-1).getX()-wayPoints.get(i).getX()), (wayPoints.get(i-1).getY()-wayPoints.get(i).getY()));
         }
+        drive.setPathLength(pathLength);
         drive.setMaxPower(movePower);
         drive.update();
     }
-    public boolean isFinished() {
-        // Implement logic to determine if the path following is finished
-        return PurePursuitUtil.getEnding(); // Placeholder logic
+    public Pose2d getFollowHeading(){
+        return followHeading;
+    }
+    public Pose2d getFollowDrive(){
+        return followDrive;
+    }
+    public void setMovePower(double movePower){
+        this.movePower = movePower;
+    }
+    public double getPathLength(){
+        return pathLength;
     }
 }
 
