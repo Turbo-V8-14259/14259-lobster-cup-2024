@@ -74,6 +74,7 @@ public class NewDT{
     public static double pkd =0.0005;
     public static double yMultiplier = 1.3;
     public static double xMultiplier = 1;
+    public static double zeroMoveAngle = 360;
 
     public NewDT(HardwareMap hardwareMap, Pose2d startPose, ElapsedTime timer){
         this.timer = timer;
@@ -166,27 +167,37 @@ public class NewDT{
 
 
         rOut = (deltaR * rkp - deltaRRateOfChange * rkd);
+        if (Math.abs(rOut) > DTConstants.maxAngularPower)
+            rOut = DTConstants.maxAngularPower * Math.signum(rOut);
         //heading power
 
+        // rotation matrix
         xPower = (xOut * T.cos(rRn) - yOut * T.sin(rRn));
         yPower = (xOut * T.sin(rRn) + yOut * T.cos(rRn));
-        //rotation matrix
-//        if (Math.abs(xPower) > 1)
-//            xPower = DTConstants.maxAxialPower * Math.signum(xPower);
-//        if (Math.abs(yPower) > 1)
-//            yPower = DTConstants.maxAxialPower * Math.signum(yPower);
-//        if (Math.abs(rOut) > DTConstants.maxAngularPower)
-//            rOut = DTConstants.maxAngularPower * Math.signum(rOut);
 
 
-        double zeroMoveAngle = Math.toRadians(25);
-        double errorScale = 1 - (Math.abs(deltaR) / zeroMoveAngle);
+
+
+
+        double errorScale = 1 - (Math.abs(deltaR) / Math.toRadians(zeroMoveAngle));
         if (errorScale < 0) {
             errorScale = 0;
         }
         xPower *= errorScale;
         yPower *= errorScale;
         //if heading error is big, then drive slows down - make sure deltaR is not reversed cuz i changed sum stuff up
+
+
+        // if powers are over 1, then we get the percentage of xPower and yPower and scale translational movements down by that percentage and weigh heading more
+        if(Math.abs(xPower) + Math.abs(yPower) + Math.abs(rOut) > 1.0) {
+
+            double translationPower = 1.0 - Math.abs(rOut);
+            double xPercent = Math.abs(xPower) / (Math.abs(xPower) + Math.abs(yPower));
+
+            xPower = Math.signum(xPower) * translationPower * xPercent;
+            yPower = Math.signum(yPower) * translationPower * (1 - xPercent);
+
+        }
 
 
 
