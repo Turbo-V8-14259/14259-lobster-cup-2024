@@ -33,7 +33,7 @@ public class VisionLocalizer {
     private final float ox;
     private final float oz;
     // UNITS ARE METERS
-    double tagsize = 0.2286;
+    double tagsize = 0.0508;
     int numFramesWithoutDetection = 0;
 
 

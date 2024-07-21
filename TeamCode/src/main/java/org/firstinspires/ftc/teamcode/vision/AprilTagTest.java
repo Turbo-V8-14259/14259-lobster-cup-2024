@@ -39,22 +39,26 @@ public class AprilTagTest extends LinearOpMode {
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
     VectorF tagPos;
     Orientation tagOrientation;
-    AprilTagLibrary currLibrary = AprilTagGameDatabase.getCurrentGameTagLibrary();
+    AprilTagLibrary curLib = AprilTagGameDatabase.getCurrentGameTagLibrary();
     // Lens intrinsics
     // UNITS ARE PIXELS
     // NOTE: this calibration is for the C920 webcam at 800x448.
     // You will need to do your own calibration for other configurations!
-    double fx = 635.906168592f;
+    /*double fx = 635.906168592f;
     double fy = 635.906168592f;
     double cx = 451.512327554f;
-    double cy = 232.379726059f;
+    double cy = 232.379726059f;*/
+    double fx = 2060.46424558f;
+    double fy = 2060.46424558f;
+    double cx = 541.472379696f;
+    double cy = 344.426949803f;
     // UNITS ARE METERS
     double tagsize = 0.2286;
     int numFramesWithoutDetection = 0;
 
     @Override
     public void runOpMode() {
-        AprilTagLibrary curLib = AprilTagGameDatabase.getCenterStageTagLibrary();
+
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -64,7 +68,7 @@ public class AprilTagTest extends LinearOpMode {
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                camera.startStreaming(864, 480, OpenCvCameraRotation.UPRIGHT);
+                camera.startStreaming(800, 600, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
