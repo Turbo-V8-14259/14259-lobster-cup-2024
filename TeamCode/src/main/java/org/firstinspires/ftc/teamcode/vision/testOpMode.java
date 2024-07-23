@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.vision;
 
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -64,8 +65,8 @@ public class testOpMode extends LinearOpMode {
 
                         Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
 
-                        kx=detection.pose.x+(0.5*invX);
-                        kz=detection.pose.z+(0.2032*invZ);
+                        kx=detection.pose.x+(0.064*invX);
+                        kz=detection.pose.z+(0.2*invZ);
                         double t1 = (Math.PI / 2) - Math.atan2(kz, kz);
 
                         double t2 = Math.toRadians(rot.firstAngle);
