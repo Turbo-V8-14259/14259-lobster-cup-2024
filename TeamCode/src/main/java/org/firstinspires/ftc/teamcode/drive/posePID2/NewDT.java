@@ -72,7 +72,7 @@ public class NewDT{
     double deltaPathRateOfChange=0;
     public static double pkp = 0.13;
     public static double pkd =0.0005;
-    public static double yMultiplier = 1.3;
+    public static double yMultiplier = 1;
     public static double xMultiplier = 1;
     public static double zeroMoveAngle = 360;
 
