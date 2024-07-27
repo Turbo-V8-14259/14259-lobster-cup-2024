@@ -5,13 +5,11 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
 import org.openftc.apriltag.AprilTagDetection;
@@ -32,7 +30,7 @@ public class testOpMode extends LinearOpMode {
     double fy = 814.513f;
     double cx = 397.286f;
     double cy = 291.207f;
-    public static int invX=1;
+    public static int invX=0;
     public static int invZ=0;
     double kx;
     double kz;
@@ -48,7 +46,7 @@ public class testOpMode extends LinearOpMode {
         Portal_1_View_ID = (int) JavaUtil.inListGet(myPortalsList, JavaUtil.AtMode.FROM_START, 0, false);
         Portal_2_View_ID = (int) JavaUtil.inListGet(myPortalsList, JavaUtil.AtMode.FROM_START, 1, false);*/
         Portal_1_View_ID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        VisionLocalizer visionLocalizer = new VisionLocalizer(fx, fy, cx, cy, hardwareMap, "Webcam 1", Portal_1_View_ID, 2.5f,8f);
+        VisionLocalizer visionLocalizer = new VisionLocalizer(fx, fy, cx, cy, hardwareMap, "Webcam 1", Portal_1_View_ID, 2.5f,8f, invX, invZ);
         visionLocalizer.startStreaming();
         waitForStart();
         telemetry.setMsTransmissionInterval(50);
@@ -60,7 +58,13 @@ public class testOpMode extends LinearOpMode {
 
                 } else {
                     for (AprilTagDetection detection : detections) {
-                        tagPos = curLib.lookupTag(detection.id).fieldPosition;
+                        try {
+                            tagPos = curLib.lookupTag(detection.id).fieldPosition;
+                        }
+                        catch (NullPointerException ignored){
+
+                        }
+
                         tagOrientation = curLib.lookupTag(detection.id).fieldOrientation.toOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
 
                         Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
@@ -91,6 +95,7 @@ public class testOpMode extends LinearOpMode {
                         telemetry.addLine(String.format("Elevation: %.2f degrees", Math.atan(detection.pose.y / detection.pose.z) * (180 / Math.PI)));
                         telemetry.addLine("True x:" + tx);
                         telemetry.addLine("True z:" + tz);
+                        telemetry.addLine(visionLocalizer.getGlobalPos().toString());
                     }
 
                 }
