@@ -20,6 +20,7 @@ public class AprilTagLocationTest {
                                 .lineToLinearHeading(new Pose2d(60.25F, -29.41F))
                                 .lineToLinearHeading(new Pose2d(60.25F, -35.41F))
                                 .lineToLinearHeading(new Pose2d(60.25F, -41.41F))
+                                .lineToLinearHeading(new Pose2d(43.0F,-39.4F,Math.toRadians(28.5F)))
 
                                 .build()
                 );

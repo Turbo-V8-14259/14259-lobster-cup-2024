@@ -39,6 +39,7 @@ public class UtilityCameraFrameCapture extends LinearOpMode {
         while (opModeIsActive() && !isStopRequested()) {
             boolean x = gamepad1.x;
             if (x&&!lastX){
+
                 captureImagePipeline.saveMatToDisk();
             }
             lastX=x;

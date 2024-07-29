@@ -48,12 +48,12 @@ public class AprilTagTest extends LinearOpMode {
     double fy = 635.906168592f;
     double cx = 451.512327554f;
     double cy = 232.379726059f;*/
-    double fx = 2060.46424558f;
-    double fy = 2060.46424558f;
-    double cx = 541.472379696f;
-    double cy = 344.426949803f;
+    double fx = 883.846030309f;
+    double fy = 883.846030309f;
+    double cx = 416.860113959f;
+    double cy = 295.808977317f;
     // UNITS ARE METERS
-    double tagsize = 0.2286;
+    double tagsize = 0.0508f;
     int numFramesWithoutDetection = 0;
 
     @Override
@@ -120,13 +120,13 @@ public class AprilTagTest extends LinearOpMode {
 
                         Orientation rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
 
-                        double t1 = (Math.PI / 2) - Math.atan2(detection.pose.x+(0.0635*invX), detection.pose.z+(0.2032*invZ));
+                        double t1 = (Math.PI / 2) - Math.atan2(detection.pose.x, detection.pose.z);
 
                         double t2 = Math.toRadians(rot.firstAngle);
 
                         double t3 = (t1 + t2);
 
-                        double c = Math.sqrt(Math.pow((detection.pose.x+(0.0635*invX)) * FEET_PER_METER, 2) + Math.pow((detection.pose.z+(0.2032*invZ)) * FEET_PER_METER, 2));
+                        double c = Math.sqrt(Math.pow((detection.pose.x) * FEET_PER_METER, 2) + Math.pow((detection.pose.z) * FEET_PER_METER, 2));
 
                         double tx = Math.cos(t3) * c;
 
@@ -149,7 +149,6 @@ public class AprilTagTest extends LinearOpMode {
                             //print out tag metadata
                             telemetry.addLine(tagPos.get(0) + " " + tagPos.get(1) + " " + tagPos.get(2) + " ");
                             telemetry.addLine(tagOrientation.toString());
-                            telemetry.addLine(tagPos.get(0) + "");
                         } catch (Exception ignored) {
 
                         }

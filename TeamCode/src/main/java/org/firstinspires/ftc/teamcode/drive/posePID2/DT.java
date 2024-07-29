@@ -456,6 +456,9 @@ public class DT{
     public void setPoseEstimate(Pose2d pose){
         this.drive.setPoseEstimate(pose);
     }
+    public Pose2d getPoseEstimate(){
+        return this.drive.getPoseEstimate();
+    }
     public void lineTo(double x, double y, double r){
         setXTarget(x);
         setYTarget(y);
