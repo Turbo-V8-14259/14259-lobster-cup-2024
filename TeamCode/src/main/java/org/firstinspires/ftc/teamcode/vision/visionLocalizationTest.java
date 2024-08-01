@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.vision;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -37,7 +38,7 @@ public class visionLocalizationTest extends LinearOpMode {
         drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         drive.setPoseEstimate(new Pose2d(0, 0, 0));
         Portal_1_View_ID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        VisionLocalizer visionLocalizer = new VisionLocalizer(fx, fy, cx, cy, hardwareMap, "Webcam 1", Portal_1_View_ID, ox, oz, telemetry);
+        VisionLocalizer visionLocalizer = new VisionLocalizer(fx, fy, cx, cy, hardwareMap, "Webcam 1", Portal_1_View_ID, ox, oz);
         visionLocalizer.startStreaming();
 
         waitForStart();
@@ -48,7 +49,7 @@ public class visionLocalizationTest extends LinearOpMode {
 
             robotPos = visionLocalizer.getGlobalPos();
             if ((robotPos == null)) {
-                robotPos=drive.getPoseEstimate();
+                robotPos = drive.getPoseEstimate();
                 telemetry.addLine(String.format(Locale.US, "Robot x: %.2f inches", robotPos.getX()));
                 telemetry.addLine(String.format(Locale.US, "Robot y: %.2f inches", robotPos.getY()));
                 telemetry.addLine(String.format(Locale.US, "Robot heading: %.2f degrees\n", Math.toDegrees(robotPos.getHeading())));

@@ -16,7 +16,7 @@
 //import org.firstinspires.ftc.teamcode.hardware.SATest;
 //import org.firstinspires.ftc.teamcode.hardware.SlidesArm;
 //import org.firstinspires.ftc.teamcode.usefuls.Gamepad.stickyGamepad;
-//import org.firstinspires.ftc.teamcode.vision.CameraPipelineBlue;
+//import org.firstinspires.ftc.teamcode.vision.pipeline.CameraPipelineBlue;
 //import org.openftc.easyopencv.OpenCvCamera;
 //import org.openftc.easyopencv.OpenCvCameraFactory;
 //import org.openftc.easyopencv.OpenCvCameraRotation;

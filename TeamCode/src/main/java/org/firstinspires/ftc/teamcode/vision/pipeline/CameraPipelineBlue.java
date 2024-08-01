@@ -1,6 +1,4 @@
-package org.firstinspires.ftc.teamcode.vision;
-
-import com.acmerobotics.dashboard.config.Config;
+package org.firstinspires.ftc.teamcode.vision.pipeline;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
@@ -13,17 +11,17 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.Objects;
-@Config
-public class CameraPipelineRed extends OpenCvPipeline
+
+public class CameraPipelineBlue extends OpenCvPipeline
 {
-    public static double rx1l=1.3;
-    public static double ry1l=1.3;
-    public static double rx2l=0.85;
-    public static double ry2l=3.5;
-    public static double rx1r=4;
-    public static double ry1r=4.5;
-    public static double rx2r=1.2;
-    public static double ry2r=2;
+    private static double rx1l=1;
+    private static double ry1l=1.3;
+    private static double rx2l=0.9;
+    private static double ry2l=3.5;
+    private static double rx1r=4;
+    private static double ry1r=4.5;
+    private static double rx2r=1.2;
+    private static double ry2r=2;
     private static double bx1l=0.4;
     private static double by1l=1.4;
     private static double bx2l=2.2;
@@ -33,7 +31,7 @@ public class CameraPipelineRed extends OpenCvPipeline
     private static double bx2r=4.7;
     private static double by2r=3.5;
 
-    public static String color="RED";
+    public static String color="BLUE";
     public static double perThreshold = 15;
     Telemetry telemetry;
     static Rect LEFT_ROI = null;
@@ -41,7 +39,7 @@ public class CameraPipelineRed extends OpenCvPipeline
     public static String ObjectDirection;
     Mat mat = new Mat();
 
-    public CameraPipelineRed(Telemetry t){
+    public CameraPipelineBlue(Telemetry t){
         this.telemetry = t;
     }
 
@@ -189,7 +187,7 @@ public class CameraPipelineRed extends OpenCvPipeline
 
     }
     public static void setColor(String color){
-        CameraPipelineRed.color = color;
+        CameraPipelineBlue.color = color;
     }
     /*public static OpenCvWebcam initPipeline(HardwareMap hardwareMap, Telemetry telemetry) {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());

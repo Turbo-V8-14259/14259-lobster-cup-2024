@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.vision;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -20,6 +21,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 @Config
 public class VisionLocalizer {
@@ -34,34 +36,32 @@ public class VisionLocalizer {
     public static double ox;
     public static double oz;
 
-    double t1;
-    double t2;
-    double t3;
-    double c;
-    double tx = 0;
-    double tz = 0;
-    Orientation rot;
-    OpenCvCamera camera;
-    AprilTagDetectionPipeline aprilTagDetectionPipeline;
-    double kx;
-    double kz;
-    VectorF tagPos;
-    Orientation tagOrientation;
-    AprilTagLibrary curLib = AprilTagGameDatabase.getCurrentGameTagLibrary();
-    ArrayList<AprilTagDetection> detections;
-    ArrayList<Double> allTagXs=new ArrayList<Double>();
-    ArrayList<Double> allTagZs=new ArrayList<Double>();
-    ArrayList<Double> allTagHeading= new ArrayList<Double>();
-    double averageX;
-    double averageZ;
-    double averageHeading;
-    double tagsize = 0.0508;
-    Telemetry telemetry;
-    double sum;
+    private double t1;
+    private double t2;
+    private double t3;
+    private double c;
+    private double tx = 0;
+    private double tz = 0;
+    private Orientation rot;
+    private OpenCvCamera camera;
+    private AprilTagDetectionPipeline aprilTagDetectionPipeline;
+    private double kx;
+    private double kz;
+    private VectorF tagPos;
+    private Orientation tagOrientation;
+    private final AprilTagLibrary curLib = AprilTagGameDatabase.getCurrentGameTagLibrary();
+    private ArrayList<AprilTagDetection> detections;
+    private ArrayList<Double> allTagXs = new ArrayList<Double>();
+    private ArrayList<Double> allTagZs = new ArrayList<Double>();
+    private ArrayList<Double> allTagHeading = new ArrayList<Double>();
+    private double averageX;
+    private double averageZ;
+    private double averageHeading;
+    private double tagsize = 0.0508;
+    private double sum;
 
 
-    public VisionLocalizer(double fx, double fy, double cx, double cy, HardwareMap hardwareMap, String camName, int id, double ox, double oz, Telemetry telemetry) {
-        AprilTagLibrary curLib = AprilTagGameDatabase.getCurrentGameTagLibrary();
+    public VisionLocalizer(double fx, double fy, double cx, double cy, HardwareMap hardwareMap, String camName, int id, double ox, double oz) {
 
         this.fx = fx;
         this.fy = fy;
@@ -72,14 +72,13 @@ public class VisionLocalizer {
         this.id = id;
         this.ox = ox / 12;
         this.oz = oz / 12;
-        this.telemetry = telemetry;
 
     }
 
     public void startStreaming() {
         //int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, camName), id);
-        aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
+        aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy, curLib);
 
         camera.setPipeline(aprilTagDetectionPipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
@@ -96,22 +95,15 @@ public class VisionLocalizer {
         });
     }
 
-    public ArrayList<AprilTagDetection> testFunc() {
-        return aprilTagDetectionPipeline.getDetectionsUpdate();
-    }
 
     public Pose2d findRelativePos(int id) {
 
         detections = aprilTagDetectionPipeline.getLatestDetections();
         if (!(detections == null || detections.isEmpty())) {
+
             for (AprilTagDetection detection : detections) {
                 if (detection.id == id) {
-                    try {
-                        tagPos = curLib.lookupTag(detection.id).fieldPosition;
-                        tagOrientation = curLib.lookupTag(detection.id).fieldOrientation.toOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-                    } catch (NullPointerException ignored) {
 
-                    }
 
                     rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
 
@@ -145,36 +137,47 @@ public class VisionLocalizer {
         allTagHeading.clear();
 
         if (!(detections == null || detections.isEmpty())) {
-            for (AprilTagDetection detection : detections) {
+            try {
+                for (AprilTagDetection detection : detections) {
 
-                try {//will give NullPointerException when tag is not in AprilTagLibrary
-                    tagPos = curLib.lookupTag(detection.id).fieldPosition;
-                    tagOrientation = curLib.lookupTag(detection.id).fieldOrientation.toOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
+                    try {//will give NullPointerException when tag is not in AprilTagLibrary
+                        tagPos = curLib.lookupTag(detection.id).fieldPosition;
+                        tagOrientation = curLib.lookupTag(detection.id).fieldOrientation.toOrientation(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
+                        System.out.println(tagOrientation);
 
+                        rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
 
-                    rot = Orientation.getOrientation(detection.pose.R, AxesReference.INTRINSIC, AxesOrder.YXZ, AngleUnit.DEGREES);
+                        kx = (detection.pose.x * FEET_PER_METER) - ox;
+                        kz = (detection.pose.z * FEET_PER_METER) + oz;
+                        t1 = (Math.PI / 2) - Math.atan2(kx, kz);
 
-                    kx = (detection.pose.x * FEET_PER_METER) - ox;
-                    kz = (detection.pose.z * FEET_PER_METER) + oz;
-                    t1 = (Math.PI / 2) - Math.atan2(kx, kz);
+                        t2 = Math.toRadians(rot.firstAngle);
 
-                    t2 = Math.toRadians(rot.firstAngle);
+                        t3 = (t1 + t2);
 
-                    t3 = (t1 + t2);
+                        c = Math.sqrt(Math.pow(kx, 2) + Math.pow(kz, 2));
 
-                    c = Math.sqrt(Math.pow(kx, 2) + Math.pow(kz, 2));
+                        tx = Math.cos(t3) * c;
 
-                    tx = Math.cos(t3) * c;
+                        tz = Math.sin(t3) * c;
+                        if (Math.rint(tagOrientation.thirdAngle) == -90) {
+                            allTagXs.add(tagPos.get(1) + (tx * 12));
+                            allTagZs.add(tagPos.get(0) - (tz * 12));
+                            allTagHeading.add((double) (180 + rot.firstAngle));
+                        } else if (Math.rint(tagOrientation.thirdAngle) == 90) {
+                            allTagXs.add(tagPos.get(1) - (tx * 12));
+                            allTagZs.add(tagPos.get(0) + (tz * 12));
+                            allTagHeading.add((double) (rot.firstAngle));
+                        }
 
-                    tz = Math.sin(t3) * c;
-                    allTagXs.add(tagPos.get(1) + (tx*12));
-                    allTagZs.add(tagPos.get(0) - (tz*12));
-                    allTagHeading.add((double) (180 + rot.firstAngle));
+                    } catch (NullPointerException ignored) {
 
-                } catch (NullPointerException ignored) {
+                    }
 
                 }
-
+            } catch (ConcurrentModificationException e) {
+                System.out.println("ConcurrentModificationException occurred");
+                return null;
             }
             return new Pose2d(average(allTagZs), average(allTagXs), Math.toRadians(average(allTagHeading)));
         }
@@ -186,7 +189,8 @@ public class VisionLocalizer {
     public void stopStreaming() {
         camera.stopStreaming();
     }
-    private double average(ArrayList<Double> l){
+
+    private double average(ArrayList<Double> l) {
         if (l == null || l.isEmpty()) {
             return 0;
         }
@@ -195,7 +199,7 @@ public class VisionLocalizer {
         for (Double a : l) {
             sum += a;
         }
-        sum=sum/l.size();
+        sum = sum / l.size();
 
 
         return sum;
