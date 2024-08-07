@@ -74,7 +74,7 @@ public class NewDT{
     public static double pkd =0.0005;
     public static double yMultiplier = 1;
     public static double xMultiplier = 1;
-    public static double zeroMoveAngle = 360;
+    public static double zeroMoveAngle = 45;
 
     public NewDT(HardwareMap hardwareMap, Pose2d startPose, ElapsedTime timer){
         this.timer = timer;
@@ -392,6 +392,11 @@ public class NewDT{
 
     public void setFollowRadius(double radius){
         this.followRadius = radius;
+    }
+
+    public boolean withinPoint(Pose2d endpoint, double range){
+        double value = Math.hypot(getX()-endpoint.getX(), getY()-endpoint.getY());
+        return value < range;
     }
 
 
