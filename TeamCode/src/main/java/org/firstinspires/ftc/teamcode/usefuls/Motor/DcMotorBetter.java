@@ -15,6 +15,7 @@ public class DcMotorBetter implements Motor {
     private double upperBound = 1.0;
     private double position = 0.0;
     private double power = 0.0;
+    private double lastPower = 0.0;
 
     public DcMotorBetter(DcMotorEx dcMotorEx) {
         this.dcMotorEx = dcMotorEx;
@@ -122,9 +123,12 @@ public class DcMotorBetter implements Motor {
                 double power = this.power;
                 if (this.direction != this.dcMotorEx.getDirection()) power = -power;
                 this.dcMotorEx.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-                this.dcMotorEx.setPower(power);
-                this.power = 0.0;
+                if(Math.abs(this.power - this.lastPower) > .05){
+                    this.dcMotorEx.setPower(power);
+                }
+//                this.power = 0.0;
                 this.position = this.getCurrentPosition();
+                this.lastPower = this.power;
                 break;
             }
         }

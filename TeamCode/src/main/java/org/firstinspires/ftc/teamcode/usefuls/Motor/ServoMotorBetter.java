@@ -12,6 +12,7 @@ public class  ServoMotorBetter implements Motor {
     private double lowerBound = 0.0;
     private double upperBound = 1.0;
     private double position = 0.0;
+    private double lastPosition = 0.0
 
     public ServoMotorBetter(Servo dcMotorEx) {
         this.servo = dcMotorEx;
@@ -56,6 +57,9 @@ public class  ServoMotorBetter implements Motor {
     }
 
     public void update() {
-        this.servo.setPosition(M.lerp(this.lowerBound, this.upperBound, this.position));
+        if(Math.abs(this.position - this.lastPosition) > 0.0001) {
+            this.servo.setPosition(M.lerp(this.lowerBound, this.upperBound, this.position));
+        }
+        this.lastPosition = this.position;
     }
 }
