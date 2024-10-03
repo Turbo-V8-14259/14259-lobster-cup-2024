@@ -11,8 +11,11 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.path.PurePursuitUtil;
 import org.firstinspires.ftc.teamcode.usefuls.Math.M;
 import org.firstinspires.ftc.teamcode.usefuls.Math.T;
+
+import java.util.ArrayList;
 
 @Config
 public class NewDT{
@@ -40,7 +43,6 @@ public class NewDT{
     private boolean ending = false;
 
     private double maxPower = 1;
-    private double followRadius = 0;
     private double flPower, frPower, blPower, brPower;
 
     private double normalize;
@@ -75,6 +77,16 @@ public class NewDT{
     public static double yMultiplier = 1;
     public static double xMultiplier = 1;
     public static double zeroMoveAngle = 45;
+    //pure pursuit vars start here
+    private double moveRadius;
+    private double headingRadius;
+    private double movePower;
+    private  ArrayList<Pose2d> Waypoints;
+    private Pose2d lastDrivePoint;
+    private Pose2d lastHeadingPoint;
+    private boolean velExtr;
+    private Pose2d followDrive, followHeading;
+    private double headingOffset;
 
     public NewDT(HardwareMap hardwareMap, Pose2d startPose, ElapsedTime timer){
         this.timer = timer;
@@ -156,8 +168,8 @@ public class NewDT{
         yOut = deltaY;
         //literally gets deltas
 
-        xOut/=followRadius;
-        yOut/=followRadius;
+        xOut/=moveRadius;
+        yOut/=moveRadius;
         pathController = pathLength *pkp + deltaPathRateOfChange*pkd;
         if(maxPower<pathController){
             pathController = maxPower;
@@ -214,9 +226,6 @@ public class NewDT{
         lastPathLength = pathLength;
         //updating the last values
 
-    }
-    public void setPathLength(double pathLength){
-        this.pathLength = pathLength;
     }
     public double getPathController(){
         return pathController;
@@ -390,14 +399,55 @@ public class NewDT{
         this.ending = a;
     }
 
-    public void setFollowRadius(double radius){
-        this.followRadius = radius;
-    }
 
     public boolean withinPoint(Pose2d endpoint, double range){
         double value = Math.hypot(getX()-endpoint.getX(), getY()-endpoint.getY());
         return value < range;
     }
+    //setter method for pure pursuit constants
+    public void setPPConstants(double mr, double hr, double mp){
+        moveRadius = mr;
+        headingRadius = hr;
+        movePower = mp;
+        on = true;
+    }
+    //every segment of nonstop movement(aka accounts for break for carryinh out other actions), assuming new path
+    public void newPath(ArrayList<Pose2d> wayPoints, double headingOffset, boolean velExtr){
+        Waypoints = wayPoints;
+        this.headingOffset = headingOffset;
+        PurePursuitUtil.updateMoveSegment(1);
+        PurePursuitUtil.updateHeadingSegment(1);
+        lastDrivePoint = wayPoints.get(0);
+        lastHeadingPoint = wayPoints.get(0);
+        this.velExtr = velExtr;
+    }
+    //actullay pp execution
+    public void followDrive(){
+        if(velExtr){
+            followDrive = PurePursuitUtil.followMe(new ArrayList<>(Waypoints), getFuturePos(500), moveRadius, lastDrivePoint, false);
+            lastDrivePoint = followDrive;
 
+            //true for heading
 
+            followHeading = PurePursuitUtil.followMe(new ArrayList<>(Waypoints), getFuturePos(500), headingRadius, lastHeadingPoint, true);
+            lastHeadingPoint = followHeading;
+        }
+        else{
+            followDrive = PurePursuitUtil.followMe(new ArrayList<>(Waypoints), getLocation(), moveRadius, lastDrivePoint, false);
+            lastDrivePoint = followDrive;
+
+            //true for heading
+
+            followHeading = PurePursuitUtil.followMe(new ArrayList<>(Waypoints), getLocation(), headingRadius, lastHeadingPoint, true);
+            lastHeadingPoint = followHeading;
+            lineTo(followDrive.getX(), followDrive.getY(),toPoint(getX(), getY(), getR(), followHeading.getX(), followHeading.getY())+headingOffset);
+            pathLength = Math.hypot((Waypoints.get(PurePursuitUtil.getMoveSegment()).getX()-getX()), (Waypoints.get(PurePursuitUtil.getMoveSegment()).getY()-getY()));
+            for(int i=PurePursuitUtil.getMoveSegment()+1;i<Waypoints.size();i++){
+                pathLength += Math.hypot((Waypoints.get(i-1).getX()-Waypoints.get(i).getX()), (Waypoints.get(i-1).getY()-Waypoints.get(i).getY()));
+            }
+            this.pathLength = pathLength;
+            maxPower = movePower;
+            update();
+        }
+    }
 }

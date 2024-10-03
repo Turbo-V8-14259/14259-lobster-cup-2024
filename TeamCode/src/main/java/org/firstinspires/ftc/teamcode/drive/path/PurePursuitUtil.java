@@ -127,16 +127,6 @@ public class PurePursuitUtil {
         return distBefore/dist;
 
     }
-
-//    public static boolean isThereAny(Pose2d w1, Pose2d w2, Pose2d rb){
-//        ArrayList<Pose2d> intersections = lineCircleIntersection(rb, 15, w1, w2);
-//        if(intersections.size()!=0){
-//            return true;
-//        }else{
-//            return false;
-//        }
-//    }
-
     public static Pose2d followMe(ArrayList<Pose2d> path, Pose2d robotLocation, double followRadius, Pose2d lastPoint, boolean heading ) {
 
 
@@ -342,12 +332,4 @@ public class PurePursuitUtil {
     public static double distanceTo(Pose2d robot, Pose2d target){
         return hypot(robot.getX()-target.getX(), robot.getY()-target.getY());
     }
-
-//    public static boolean getEnding(){
-//        return ending;
-//    }
-//
-//    public static void updateEnding(boolean a){
-//        ending=a;
-//    }
 }
