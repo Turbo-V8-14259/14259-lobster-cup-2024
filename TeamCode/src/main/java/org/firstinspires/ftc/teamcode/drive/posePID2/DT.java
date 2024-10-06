@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode.drive.posePID2;
 
 import com.ThermalEquilibrium.homeostasis.Controllers.Feedback.BasicPID;
 import com.ThermalEquilibrium.homeostasis.Parameters.PIDCoefficients;
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -11,6 +13,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.odo.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.usefuls.Math.M;
 import org.firstinspires.ftc.teamcode.usefuls.Math.T;
 
@@ -18,7 +21,7 @@ import org.firstinspires.ftc.teamcode.usefuls.Math.T;
 public class DT{
 
     private boolean forceStop = false;
-    private SampleMecanumDrive drive;
+    private GoBildaPinpointDriver odo;
     private VoltageSensor vs;
     private double compensator;
     private DcMotorEx leftFront, rightRear, rightFront, leftRear;
@@ -33,7 +36,6 @@ public class DT{
 
     public double turnVelocity;
 
-    private boolean purePersuiting = false;
 
     private BasicPID xController, yController, rController, pprController, NxController, NyController;
     private PIDCoefficients xyCoeff, rCoeff, pprCoeff, NxyCoeff;
@@ -65,11 +67,15 @@ public class DT{
     double yVelocity = 0;
     public static double rkp=1;
     public static double rkd=0;
+    public static double yOffset = 100; //100
+    public static double xOffset = 84; //84
+    public DT(HardwareMap hardwareMap){
+
+    }
     public DT(HardwareMap hardwareMap, ElapsedTime timer){
         this.timer = timer;
         this.vs = hardwareMap.voltageSensor.iterator().next();
-        this.drive = new SampleMecanumDrive(hardwareMap);
-        this.drive.setPoseEstimate(new Pose2d(0, 0, 0));
+        this.odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
         this.leftFront = hardwareMap.get(DcMotorEx.class, "fl");
         this.leftRear = hardwareMap.get(DcMotorEx.class, "bl");
         this.rightRear = hardwareMap.get(DcMotorEx.class, "br");
@@ -92,70 +98,17 @@ public class DT{
         this.xTarget = 0;
         this.yTarget = 0;
         this.rTarget = 0;
-        if(drive.getPoseEstimate().getX() != 0 || drive.getPoseEstimate().getY() != 0 || drive.getPoseEstimate().getHeading() != 0){
-            drive.setPoseEstimate(new Pose2d(0, 0, 0));
-        }
+
+        odo.setOffsets(xOffset, yOffset);
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        odo.resetPosAndIMU();
     }
 
-    public DT(HardwareMap hardwareMap){
-        this.vs = hardwareMap.voltageSensor.iterator().next();
-        this.drive = new SampleMecanumDrive(hardwareMap);
-        this.drive.setPoseEstimate(new Pose2d(0, 0, 0));
-        this.leftFront = hardwareMap.get(DcMotorEx.class, "fl");
-        this.leftRear = hardwareMap.get(DcMotorEx.class, "bl");
-        this.rightRear = hardwareMap.get(DcMotorEx.class, "br");
-        this.rightFront = hardwareMap.get(DcMotorEx.class, "fr");
-        rightRear.setDirection(DcMotor.Direction.REVERSE);
-        rightFront.setDirection(DcMotor.Direction.FORWARD);
-        leftFront.setDirection(DcMotor.Direction.REVERSE);
-        leftRear.setDirection(DcMotor.Direction.FORWARD); //turning reversed
-        this.xyCoeff = new PIDCoefficients(DTConstants.xyP, DTConstants.xyI, DTConstants.xyD);
-        this.rCoeff = new PIDCoefficients(DTConstants.rP, DTConstants.rI, DTConstants.rD);
-        this.pprCoeff = new PIDCoefficients(DTConstants.pPrP, DTConstants.pPrI, DTConstants.pPrD);
-        this.xController = new BasicPID(xyCoeff);
-        this.yController = new BasicPID(xyCoeff);
-        this.rController = new BasicPID(rCoeff);
-        this.NxyCoeff = new PIDCoefficients(DTConstants.NxyP, DTConstants.NxyI, DTConstants.NxyD);
-        this.pprController = new BasicPID(pprCoeff);
-        this.NxController = new BasicPID(NxyCoeff);
-        this.NyController = new BasicPID(NxyCoeff);
-        this.xTarget = 0;
-        this.yTarget = 0;
-        this.rTarget = 0;
-        if(drive.getPoseEstimate().getX() != 0 || drive.getPoseEstimate().getY() != 0 || drive.getPoseEstimate().getHeading() != 0){
-            drive.setPoseEstimate(new Pose2d(0, 0, 0));
-        }
-    }
     public DT(HardwareMap hardwareMap, Pose2d startPose, ElapsedTime timer){
         this.timer = timer;
         this.vs = hardwareMap.voltageSensor.iterator().next();
-        this.drive = new SampleMecanumDrive(hardwareMap);
-        this.drive.setPoseEstimate(startPose);
-        this.leftFront = hardwareMap.get(DcMotorEx.class, "fl");
-        this.leftRear = hardwareMap.get(DcMotorEx.class, "bl");
-        this.rightRear = hardwareMap.get(DcMotorEx.class, "br");
-        this.rightFront = hardwareMap.get(DcMotorEx.class, "fr");
-
-        rightRear.setDirection(DcMotor.Direction.REVERSE);
-        rightFront.setDirection(DcMotor.Direction.FORWARD);
-        leftFront.setDirection(DcMotor.Direction.REVERSE);
-        leftRear.setDirection(DcMotor.Direction.FORWARD); //turning reversed
-        this.xyCoeff = new PIDCoefficients(DTConstants.xyP, DTConstants.xyI, DTConstants.xyD);
-        this.rCoeff = new PIDCoefficients(DTConstants.rP, DTConstants.rI, DTConstants.rD);
-        this.pprCoeff = new PIDCoefficients(DTConstants.pPrP, DTConstants.pPrI, DTConstants.pPrD);
-        this.xController = new BasicPID(xyCoeff);
-        this.yController = new BasicPID(xyCoeff);
-        this.rController = new BasicPID(rCoeff);
-        this.pprController = new BasicPID(pprCoeff);
-
-        this.xTarget = startPose.getX();
-        this.yTarget = startPose.getY();
-        this.rTarget = startPose.getHeading();
-    }
-    public DT(HardwareMap hardwareMap, Pose2d startPose, boolean isPurePersuiting){
-        this.vs = hardwareMap.voltageSensor.iterator().next();
-        this.drive = new SampleMecanumDrive(hardwareMap);
-        this.drive.setPoseEstimate(startPose);
+        this.odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
         this.leftFront = hardwareMap.get(DcMotorEx.class, "fl");
         this.leftRear = hardwareMap.get(DcMotorEx.class, "bl");
         this.rightRear = hardwareMap.get(DcMotorEx.class, "br");
@@ -177,7 +130,10 @@ public class DT{
         this.yTarget = startPose.getY();
         this.rTarget = startPose.getHeading();
 
-//        this.setPurePersuiting(isPurePersuiting);
+        odo.setOffsets(xOffset, yOffset);
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        odo.resetPosAndIMU();
     }
     public void setPowers(double y, double x, double r){
         if(!forceStop){
@@ -201,10 +157,9 @@ public class DT{
             if (!ending) {
                 lastHeading = currentHeading;
 
-                drive.updatePoseEstimate();
-                xRn = drive.getPoseEstimate().getX();
-                yRn = drive.getPoseEstimate().getY();
-                rRn = drive.getPoseEstimate().getHeading();
+                xRn = odo.getPosition().getX();
+                yRn = odo.getPosition().getY();
+                rRn = odo.getPosition().getHeading();
                 xOut = xController.calculate(xTarget, xRn);
                 yOut = -yController.calculate(yTarget, yRn);
 //        double n = Math.hypot(xOut,yOut);
@@ -278,12 +233,11 @@ public class DT{
 
             } else {
                 lastHeading = currentHeading;
-                drive.updatePoseEstimate();
-                xRn = drive.getPoseEstimate().getX();
+                xRn = odo.getPosition().getX();
                 currentX = xRn;
-                yRn = drive.getPoseEstimate().getY();
+                yRn = odo.getPosition().getY();
                 currentY = yRn;
-                rRn = drive.getPoseEstimate().getHeading();
+                rRn = odo.getPosition().getHeading();
 
 //            xOut = NxController.calculate(xTarget, xRn);
 //            yOut = -NyController.calculate(yTarget, yRn);
@@ -364,9 +318,6 @@ public class DT{
             }
     }
 
-    public void setPurePersuiting(boolean isPurePersuiting){
-        purePersuiting = isPurePersuiting;
-    }
     public Pose2d getLocation(){
         return new Pose2d(xRn, yRn, rRn);
     }
@@ -454,10 +405,10 @@ public class DT{
         return 0;
     } //??
     public void setPoseEstimate(Pose2d pose){
-        this.drive.setPoseEstimate(pose);
+        this.odo.setPosition(pose);
     }
     public Pose2d getPoseEstimate(){
-        return this.drive.getPoseEstimate();
+        return this.odo.getPosition();
     }
     public void lineTo(double x, double y, double r){
         setXTarget(x);
@@ -480,13 +431,6 @@ public class DT{
     }
     public void setOn(boolean a){
         this.on = a;
-    }
-
-    public void finishPurePersuiting(Pose2d endPoint){
-        purePersuiting = false;
-        setXTarget(endPoint.getX());
-        setYTarget(endPoint.getY());
-        setRTarget(endPoint.getHeading());
     }
 
     //Takes in current posx, posy, posr, targetx, and targety

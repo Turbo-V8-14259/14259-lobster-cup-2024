@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.odo.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.drive.path.PurePursuitUtil;
 import org.firstinspires.ftc.teamcode.usefuls.Math.M;
 import org.firstinspires.ftc.teamcode.usefuls.Math.T;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 public class NewDT{
 
     private boolean forceStop = false;
-    private SampleMecanumDrive drive;
+    private GoBildaPinpointDriver odo;
 
     private DcMotorEx leftFront, rightRear, rightFront, leftRear;
 
@@ -34,7 +35,6 @@ public class NewDT{
 
     public double turnVelocity;
 
-    private boolean purePersuiting = false;
 
     private double xOut, yOut, rOut;
     private double twistedR, count, lastAngle;
@@ -87,11 +87,12 @@ public class NewDT{
     private boolean velExtr;
     private Pose2d followDrive, followHeading;
     private double headingOffset;
+    public static double yOffset = 100; //100
+    public static double xOffset = 84; //84
 
     public NewDT(HardwareMap hardwareMap, Pose2d startPose, ElapsedTime timer){
         this.timer = timer;
-        this.drive = new SampleMecanumDrive(hardwareMap);
-        this.drive.setPoseEstimate(startPose);
+        this.odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
 
         this.leftFront = hardwareMap.get(DcMotorEx.class, "fl");
         this.leftRear = hardwareMap.get(DcMotorEx.class, "bl");
@@ -102,10 +103,19 @@ public class NewDT{
         rightFront.setDirection(DcMotor.Direction.FORWARD);
         leftFront.setDirection(DcMotor.Direction.REVERSE);
         leftRear.setDirection(DcMotor.Direction.FORWARD);
+        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         this.xTarget = startPose.getX();
         this.yTarget = startPose.getY();
         this.rTarget = startPose.getHeading();
+
+        odo.setOffsets(xOffset, yOffset);
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        odo.resetPosAndIMU();
     }
 
     public void setPowers(double y, double x, double r){
@@ -130,18 +140,16 @@ public class NewDT{
         deltaTime = timeWrapper(timer.nanoseconds()) - lastTime;
         //change in time
 
-        drive.updatePoseEstimate();
-        xRn = drive.getPoseEstimate().getX();
-        yRn = drive.getPoseEstimate().getY();
-        rRn = drive.getPoseEstimate().getHeading();
+        xRn = -odo.getPosition().getX();
+        yRn = odo.getPosition().getY();
+        rRn = odo.getPosition().getHeading();
         //position updates
 
         if (Math.abs(rRn - lastAngle) > M.PI) count += Math.signum(lastAngle - rRn);
-        lastAngle = rRn;
-        twistedR = count * (2 * M.PI) + rRn;
+
         //heading wrapper
 
-        deltaR = -1 * (rTarget - twistedR);
+        deltaR = -1 * (rTarget - rRn);
         deltaX = xTarget - xRn;
         deltaY = -1 * (yTarget - yRn);
 
@@ -195,8 +203,8 @@ public class NewDT{
         if (errorScale < 0) {
             errorScale = 0;
         }
-        xPower *= errorScale;
-        yPower *= errorScale;
+//        xPower *= errorScale;
+//        yPower *= errorScale;
         //if heading error is big, then drive slows down - make sure deltaR is not reversed cuz i changed sum stuff up
 
 
@@ -212,7 +220,8 @@ public class NewDT{
         }
 
 
-
+        yPower = yPower*pathController*yMultiplier;
+        xPower = xPower*pathController*xMultiplier ;
         setPowers(yPower*pathController*yMultiplier, xPower*pathController*xMultiplier, -rOut);
         //actually sets power to the motor
 
@@ -224,14 +233,12 @@ public class NewDT{
         lastDeltaX = deltaX;
         lastDeltaY = deltaY;
         lastPathLength = pathLength;
+        odo.update();
         //updating the last values
 
     }
     public double getPathController(){
         return pathController;
-    }
-    public void setPurePersuiting(boolean isPurePersuiting){
-        purePersuiting = isPurePersuiting;
     }
     public double timeWrapper(double nano){
         return nano/1000000000;
@@ -277,7 +284,7 @@ public class NewDT{
         return yRn;
     }
     public double getR(){
-        return twistedR;
+        return rRn;
     }
     public double getYTarget(){
         return yTarget;
@@ -320,13 +327,13 @@ public class NewDT{
         return Math.abs(yRn - yTarget) < DTConstants.allowedAxialError;
     }
     public boolean isAtTargetR(){
-        return Math.abs(twistedR - rTarget) < DTConstants.allowedAngularError;
+        return Math.abs(rRn - rTarget) < DTConstants.allowedAngularError;
     }
     public double getTwistedR(){
         return 0;
     } //??
     public void setPoseEstimate(Pose2d pose){
-        this.drive.setPoseEstimate(pose);
+        this.odo.setPosition(pose);
     }
     public void lineTo(double x, double y, double r){
         setXTarget(x);
@@ -351,12 +358,6 @@ public class NewDT{
         this.on = a;
     }
 
-    public void finishPurePersuiting(Pose2d endPoint){
-        purePersuiting = false;
-        setXTarget(endPoint.getX());
-        setYTarget(endPoint.getY());
-        setRTarget(endPoint.getHeading());
-    }
 
     //Takes in current posx, posy, posr, targetx, and targety
     //calculates the angle to follow that requires the least rotation
@@ -399,7 +400,12 @@ public class NewDT{
         this.ending = a;
     }
 
-
+    public void setPathLength(double pathLength){
+        this.pathLength = pathLength;
+    }
+    public double getPathLength(){
+        return pathLength;
+    }
     public boolean withinPoint(Pose2d endpoint, double range){
         double value = Math.hypot(getX()-endpoint.getX(), getY()-endpoint.getY());
         return value < range;
@@ -440,14 +446,14 @@ public class NewDT{
 
             followHeading = PurePursuitUtil.followMe(new ArrayList<>(Waypoints), getLocation(), headingRadius, lastHeadingPoint, true);
             lastHeadingPoint = followHeading;
-            lineTo(followDrive.getX(), followDrive.getY(),toPoint(getX(), getY(), getR(), followHeading.getX(), followHeading.getY())+headingOffset);
+//            lineTo(followDrive.getX(), followDrive.getY(),toPoint(getX(), getY(), getR(), followHeading.getX(), followHeading.getY())+headingOffset);
             pathLength = Math.hypot((Waypoints.get(PurePursuitUtil.getMoveSegment()).getX()-getX()), (Waypoints.get(PurePursuitUtil.getMoveSegment()).getY()-getY()));
             for(int i=PurePursuitUtil.getMoveSegment()+1;i<Waypoints.size();i++){
                 pathLength += Math.hypot((Waypoints.get(i-1).getX()-Waypoints.get(i).getX()), (Waypoints.get(i-1).getY()-Waypoints.get(i).getY()));
             }
-            this.pathLength = pathLength;
+
             maxPower = movePower;
-            update();
         }
+        update();
     }
 }

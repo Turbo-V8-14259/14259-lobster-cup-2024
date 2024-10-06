@@ -20,6 +20,7 @@ public class PurePursuitUtil {
 
 
     private static double pathLength;
+    private static Pose2d check = new Pose2d(0,0);
 
     public static int getMoveSegment(){
         return moveSegment;
@@ -33,6 +34,9 @@ public class PurePursuitUtil {
     }
     public static void updateHeadingSegment(int n){
         headingSegment = n;
+    }
+    public static Pose2d getInt(){
+        return check;
     }
     public static ArrayList<Pose2d> lineCircleIntersection(Pose2d circleCenter, double radius, Pose2d linePoint1, Pose2d linePoint2, boolean acceptBefore, boolean acceptAfter) {
         double discTolerance = 0.01;
@@ -91,11 +95,13 @@ public class PurePursuitUtil {
                 if ((acceptBefore && withinSegment1<0)
                     ||(acceptAfter && withinSegment1>1)
                     || (withinSegment1<1 && withinSegment1>0)) {
+                    check = new Pose2d(xroot1, yroot1, heading(circleCenter, xroot1, yroot1));
                     allPoints.add(new Pose2d(xroot1, yroot1, heading(circleCenter, xroot1, yroot1)));
                 }
                 if ((acceptBefore && withinSegment2<0)
                         ||(acceptAfter && withinSegment2>1)
                         || (withinSegment2<1 && withinSegment2>0)) {
+
                     allPoints.add(new Pose2d(xroot2, yroot2, heading(circleCenter, xroot2, yroot2)));
                 }
             } else if (disc >= 0 && disc <= discTolerance) {
@@ -103,6 +109,7 @@ public class PurePursuitUtil {
                 double yroot = yCalculator(x1, y1, m1, xroot);
                 xroot += circleCenter.getX();
                 yroot += circleCenter.getY();
+                check = new Pose2d(xroot, yroot, heading(circleCenter, xroot, yroot));
                 allPoints.add(new Pose2d(xroot, yroot, heading(circleCenter, xroot, yroot)));
             }else{
                 Pose2d pt = recoveryPt(linePoint1, linePoint2, circleCenter);
